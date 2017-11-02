@@ -1,0 +1,6 @@
+<providers>
+    <provider class-name="org.itfactory.kettle.google.vfs.GCSFileProvider">
+        <scheme name="gcs"/>
+        <if-available class-name="com.google.cloud.storage.Storage"/>
+    </provider>
+</providers>
