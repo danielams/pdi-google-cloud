@@ -143,7 +143,8 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fdlName.right = new FormAttachment( middle, -margin );
         fdlName.top = new FormAttachment( 0, margin );
         wlName.setLayoutData( fdlName );
-        wName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        wName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER  );
+        wName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Name.Tooltip"));
         props.setLook( wName );
         wName.addModifyListener( lsMod );
         fdName = new FormData();
@@ -162,6 +163,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fcplName.top = new FormAttachment( wlName, margin );
         cplName.setLayoutData( fcplName );
         cpName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        cpName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.CredentialsPath.Tooltip"));
         props.setLook( cpName );
         cpName.addModifyListener( lsMod );
         fcpName = new FormData();
@@ -180,6 +182,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fplName.top = new FormAttachment( cpName, margin );
         plName.setLayoutData( fplName );
         pName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        pName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Project.Tooltip"));
         props.setLook( pName );
         pName.addModifyListener( lsMod );
         fpName = new FormData();
@@ -198,6 +201,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fdslName.top = new FormAttachment( pName, margin );
         dslName.setLayoutData( fdslName );
         dsName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        dsName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.DataSet.Tooltip"));
         props.setLook( dsName );
         dsName.addModifyListener( lsMod );
         fdsName = new FormData();
@@ -216,6 +220,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         ftlName.top = new FormAttachment( dsName, margin );
         tlName.setLayoutData( ftlName );
         tName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        tName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Table.Tooltip"));
         props.setLook( tName );
         tName.addModifyListener( lsMod );
         ftName = new FormData();
@@ -234,6 +239,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fslName.top = new FormAttachment( tName, margin );
         slName.setLayoutData( fslName );
         sName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        sName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Source.Tooltip"));
         props.setLook( sName );
         sName.addModifyListener( lsMod );
         fsName = new FormData();
@@ -252,6 +258,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fdelName.top = new FormAttachment( sName, margin );
         dellName.setLayoutData( fdelName );
         delName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        delName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Delimiter.Tooltip"));
         props.setLook( delName );
         delName.addModifyListener( lsMod );
         fdelName = new FormData();
@@ -270,6 +277,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fqlName.top = new FormAttachment( delName, margin );
         qlName.setLayoutData( fqlName );
         qName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        qName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Quote.Tooltip"));
         props.setLook( qName );
         qName.addModifyListener( lsMod );
         fqName = new FormData();
