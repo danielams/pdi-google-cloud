@@ -62,6 +62,10 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     private Text delName;
     private FormData fdelName;
     
+    private Label cplName;
+    private Text cpName;
+    private FormData fcplName,fcpName;
+    
     private Label plName;
     private Text pName;
     private FormData fplName,fpName;
@@ -148,6 +152,23 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fdName.right = new FormAttachment( 100, 0 );
         wName.setLayoutData( fdName );
 
+        // Credentials path
+        cplName = new Label( shell, SWT.RIGHT );
+        cplName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CredentialsPath.Label" ) );
+        props.setLook( cplName );
+        fcplName = new FormData();
+        fcplName.left = new FormAttachment( 0, 0 );
+        fcplName.right = new FormAttachment( middle, -margin );
+        fcplName.top = new FormAttachment( wlName, margin );
+        cplName.setLayoutData( fcplName );
+        cpName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+        props.setLook( cpName );
+        cpName.addModifyListener( lsMod );
+        fcpName = new FormData();
+        fcpName.left = new FormAttachment( middle, 0 );
+        fcpName.top = new FormAttachment( wlName, margin );
+        fcpName.right = new FormAttachment( 100, 0 );
+        cpName.setLayoutData( fcpName );
 
         // BigQuery Project Id
         plName = new Label( shell, SWT.RIGHT );
@@ -156,14 +177,14 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fplName = new FormData();
         fplName.left = new FormAttachment( 0, 0 );
         fplName.right = new FormAttachment( middle, -margin );
-        fplName.top = new FormAttachment( wlName, margin );
+        fplName.top = new FormAttachment( cpName, margin );
         plName.setLayoutData( fplName );
         pName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
         props.setLook( pName );
         pName.addModifyListener( lsMod );
         fpName = new FormData();
         fpName.left = new FormAttachment( middle, 0 );
-        fpName.top = new FormAttachment( wlName, margin );
+        fpName.top = new FormAttachment( cpName, margin );
         fpName.right = new FormAttachment( 100, 0 );
         pName.setLayoutData( fpName );
 
@@ -326,6 +347,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     
     public void getData() {
         wName.setText( Const.nullToEmpty( jobEntry.getName() ) );
+        cpName.setText( Const.nullToEmpty( jobEntry.getCredentialsPath() ) );
         pName.setText( Const.nullToEmpty( jobEntry.getProjectId() ) );
         delName.setText( Const.nullToEmpty( jobEntry.getDelimiter() ) );
         dsName.setText( Const.nullToEmpty( jobEntry.getDatasetName() ) );
@@ -343,6 +365,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
       return;
     }
     jobEntry.setName( wName.getText() );
+    jobEntry.setCredentialsPath(cpName.getText() );
     jobEntry.setProjectId( pName.getText() );
     jobEntry.setDelimiter( delName.getText() );
     jobEntry.setDatasetName( dsName.getText() );
