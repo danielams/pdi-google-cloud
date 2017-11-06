@@ -1,0 +1,14 @@
+{
+  "type" : "record",
+  "name" : "agedata",
+  "namespace" : "com.pentaho.afowler",
+  "fields" : [ {
+    "name" : "Name",
+    "type" : "string",
+    "doc"  : "Name of the person"
+  }, {
+    "name" : "Age",
+    "type" : "int",
+    "doc"  : "The age of a person"
+  } ]
+}
