@@ -118,6 +118,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
         retval.append( "      " ).append( XMLHandler.addTagValue( "sourceUri", sourceUri ) );
         retval.append( "      " ).append( XMLHandler.addTagValue( "delimiter", delimiter ) );
         retval.append( "      " ).append( XMLHandler.addTagValue( "quote", quote ) );
+        retval.append( "      " ).append( XMLHandler.addTagValue( "createDataset", createDataset?"Y":"N" ) );
+        retval.append( "      " ).append( XMLHandler.addTagValue( "createTable", createTable?"Y":"N" ) );
+        retval.append( "      " ).append( XMLHandler.addTagValue( "leadingRowsToSkip", leadingRowsToSkip ) );
     
         return retval.toString();
     }
@@ -132,8 +135,34 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             datasetName = XMLHandler.getTagValue( entrynode, "datasetName" );
             tableName = XMLHandler.getTagValue( entrynode, "tableName" );
             sourceUri = XMLHandler.getTagValue( entrynode, "sourceUri" );
-            delimiter = XMLHandler.getTagValue( entrynode, "delimiter" );
-            quote = XMLHandler.getTagValue( entrynode, "quote" );
+
+            String d = XMLHandler.getTagValue( entrynode, "delimiter" );
+            if (null == d) { // no empty check as sometimes you don't want a delimiter (single field only)
+                delimiter = ",";
+            } else {
+                delimiter = d;
+            }
+            String q = XMLHandler.getTagValue( entrynode, "quote" );
+            if (null == q) { // no empty check as sometimes you don't want a quote field (quotes not in csv file)
+                quote = "\"";
+            } else {
+                quote = q;
+            }
+
+            String cd = XMLHandler.getTagValue( entrynode, "createDataset" );
+            if (null == cd || "".equals(cd.trim())) {
+                createDataset = true;
+            } else {
+                createDataset = "Y".equals(cd);
+            }
+            String ct = XMLHandler.getTagValue( entrynode, "createTable" );
+            if (null == ct || "".equals(ct.trim())) {
+                createTable = true;
+            } else {
+                createTable = "Y".equals(ct);
+            }
+
+            leadingRowsToSkip = Const.toInt( XMLHandler.getTagValue( entrynode, "leadingRowsToSkip" ),1);
         } catch ( KettleXMLException xe ) {
             throw new KettleXMLException( "Unable to load job entry of type 'ftp' from XML node", xe );
         }
@@ -151,6 +180,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             sourceUri = rep.getJobEntryAttributeString( id_jobentry, "sourceUri" );
             delimiter = rep.getJobEntryAttributeString( id_jobentry, "delimiter" );
             quote = rep.getJobEntryAttributeString( id_jobentry, "quote" );
+            createDataset = rep.getJobEntryAttributeBoolean( id_jobentry, "createDataset" );
+            createTable = rep.getJobEntryAttributeBoolean( id_jobentry, "createTable" );
+            leadingRowsToSkip = (int)rep.getJobEntryAttributeInteger(id_jobentry,"leadingRowsToSkip");
 
         } catch ( KettleException dbe ) {
             throw new KettleException( "Unable to load job entry of type 'bigquery-gcs-load' from the repository for id_jobentry="
@@ -169,6 +201,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             rep.saveJobEntryAttribute( id_job, getObjectId(), "sourceUri", sourceUri );
             rep.saveJobEntryAttribute( id_job, getObjectId(), "delimiter", delimiter );
             rep.saveJobEntryAttribute( id_job, getObjectId(), "quote", quote );
+            rep.saveJobEntryAttribute( id_job, getObjectId(), "createDataset", createDataset );
+            rep.saveJobEntryAttribute( id_job, getObjectId(), "createTable", createTable );
+            rep.saveJobEntryAttribute( id_job, getObjectId(), "leadingRowsToSkip", leadingRowsToSkip );
 
         } catch ( KettleDatabaseException dbe ) {
             throw new KettleException(
@@ -308,20 +343,12 @@ try {
         return quote;
     }
 
-    public void setRowsToSkip(int skip) {
+    public void setLeadingRowsToSkip(int skip) {
         leadingRowsToSkip = skip;
     }
 
-    public int getRowsToSkip() {
+    public int getLeadingRowsToSkip() {
         return leadingRowsToSkip;
-    }
-
-    public void setTableFields(Map<String, String> fs) {
-        tableFields = fs;
-    }
-
-    public Map<String, String> getTableFields() {
-        return tableFields;
     }
 
     public void setUseContainerSecurity(boolean use) {
@@ -346,5 +373,15 @@ try {
 
     public String getCredentialsPath() {
         return credentialsPath;
+    }
+
+    
+
+    public void setTableFields(Map<String, String> fs) {
+        tableFields = fs;
+    }
+
+    public Map<String, String> getTableFields() {
+        return tableFields;
     }
 }
