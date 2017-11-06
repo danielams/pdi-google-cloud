@@ -321,7 +321,7 @@ try {
                 List<Field> fieldList = new ArrayList<Field>();
                 int nrfields = getFieldNames().length;
                 for (int i = 0;i < nrfields;i++) {
-                  fieldList.add(Field.of(fieldNames[i], getLegacyType(fieldTypes[i])));
+                  fieldList.add(Field.of(fieldNames[i], LegacySQLTypeName.valueOf(fieldTypes[i])));
                 }
                 
                 Schema schema = Schema.of(fieldList);
@@ -369,26 +369,6 @@ try {
     return null;
     }
 
-    private LegacySQLTypeName getLegacyType(String typeString) {
-        if (LegacySQLTypeName.BOOLEAN.toString().equals(typeString)) {
-            return LegacySQLTypeName.BOOLEAN;
-        } else if (LegacySQLTypeName.DATE.toString().equals(typeString)) {
-            return LegacySQLTypeName.DATE;
-        } else if (LegacySQLTypeName.DATETIME.toString().equals(typeString)) {
-            return LegacySQLTypeName.DATETIME;
-        } else if (LegacySQLTypeName.FLOAT.toString().equals(typeString)) {
-            return LegacySQLTypeName.FLOAT;
-        } else if (LegacySQLTypeName.INTEGER.toString().equals(typeString)) {
-            return LegacySQLTypeName.INTEGER;
-        } else if (LegacySQLTypeName.STRING.toString().equals(typeString)) {
-            return LegacySQLTypeName.STRING;
-        } else if (LegacySQLTypeName.TIME.toString().equals(typeString)) {
-            return LegacySQLTypeName.TIME;
-        } else if (LegacySQLTypeName.TIMESTAMP.toString().equals(typeString)) {
-            return LegacySQLTypeName.TIMESTAMP;
-        }
-        return null;
-    }
 
     public void setDatasetName(String dsn) {
         datasetName = dsn;
