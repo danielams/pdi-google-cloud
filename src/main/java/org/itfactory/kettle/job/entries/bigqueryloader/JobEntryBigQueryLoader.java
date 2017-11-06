@@ -9,6 +9,7 @@ import org.pentaho.di.job.entry.JobEntryInterface;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 
 import com.google.auth.oauth2.GoogleCredentials;
 
@@ -77,6 +78,8 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
 
     private Map<String, String> tableFields;
 
+    private String[] fieldNames = new String[]{};
+    private String[] fieldTypes = new String[]{};
 
     BigQuery bigquery;
 
@@ -128,6 +131,15 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
         retval.append( "      " ).append( XMLHandler.addTagValue( "fileType", fileType) );
         retval.append( "      " ).append( XMLHandler.addTagValue( "leadingRowsToSkip", leadingRowsToSkip ) );
     
+        retval.append( "    <fields>" ).append( Const.CR );
+        for ( int i = 0; i < fieldNames.length; i++ ) {
+          retval.append( "      <field>" ).append( Const.CR );
+          retval.append( "        " ).append( XMLHandler.addTagValue( "name", fieldNames[i] ) );
+          retval.append( "        " ).append( XMLHandler.addTagValue( "type", fieldTypes[i] ) );
+          retval.append( "      </field>" ).append( Const.CR );
+        }
+        retval.append( "    </fields>" ).append( Const.CR );
+
         return retval.toString();
     }
     
@@ -180,6 +192,22 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             }
 
             leadingRowsToSkip = Const.toInt( XMLHandler.getTagValue( entrynode, "leadingRowsToSkip" ),1);
+
+
+            int i, nrfields;
+            String type;
+      
+            Node fields = XMLHandler.getSubNode( entrynode, "fields" );
+            nrfields = XMLHandler.countNodes( fields, "field" );
+      
+            allocate( nrfields );
+      
+            for ( i = 0; i < nrfields; i++ ) {
+              Node fnode = XMLHandler.getSubNodeByNr( fields, "field", i );
+              fieldNames[i] = XMLHandler.getTagValue( fnode, "name" );
+              fieldTypes[i] = XMLHandler.getTagValue( fnode, "type" );
+            }
+
         } catch ( KettleXMLException xe ) {
             throw new KettleXMLException( "Unable to load job entry of type 'ftp' from XML node", xe );
         }
@@ -201,6 +229,15 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             createTable = rep.getJobEntryAttributeBoolean( id_jobentry, "createTable" );
             fileType = rep.getJobEntryAttributeString( id_jobentry, "fileType" );
             leadingRowsToSkip = (int)rep.getJobEntryAttributeInteger(id_jobentry,"leadingRowsToSkip");
+            
+      int nrfields = rep.countNrStepAttributes( id_jobentry, "field_name" );
+      
+            allocate( nrfields );
+      
+            for ( int i = 0; i < nrfields; i++ ) {
+              fieldNames[i] = rep.getStepAttributeString( id_jobentry, i, "field_name" );
+              fieldTypes[i] = rep.getStepAttributeString( id_jobentry, i, "field_type" );
+            }
 
         } catch ( KettleException dbe ) {
             throw new KettleException( "Unable to load job entry of type 'bigquery-gcs-load' from the repository for id_jobentry="
@@ -223,6 +260,11 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             rep.saveJobEntryAttribute( id_job, getObjectId(), "createTable", createTable );
             rep.saveJobEntryAttribute( id_job, getObjectId(), "fileType", fileType );
             rep.saveJobEntryAttribute( id_job, getObjectId(), "leadingRowsToSkip", leadingRowsToSkip );
+
+            for ( int i = 0; i < fieldNames.length; i++ ) {
+                rep.saveStepAttribute( id_job, getObjectId(), i, "field_name", fieldNames[i] );
+                rep.saveStepAttribute( id_job, getObjectId(), i, "field_type", fieldTypes[i] );
+              }
 
         } catch ( KettleDatabaseException dbe ) {
             throw new KettleException(
@@ -274,9 +316,17 @@ try {
 
             if(createTable) {
                 logDebug("Creating table based on mapping specification");
-                //TODO: Set the field list based on the mapping
-                //Schema schema = Schema.newBuilder().build();
-                //table = bigquery.create(TableInfo.of(tableId, StandardTableDefinition.of(schema)));
+                // Set the field list based on the mapping
+                
+                List<Field> fieldList = new ArrayList<Field>();
+                int nrfields = getFieldNames().length;
+                for (int i = 0;i < nrfields;i++) {
+                  fieldList.add(Field.of(fieldNames[i], getLegacyType(fieldTypes[i])));
+                }
+                
+                Schema schema = Schema.of(fieldList);
+            
+                table = bigquery.create(TableInfo.of(tableId, StandardTableDefinition.of(schema)));
             } else {
                 result.setNrErrors(1);
                 logError( "Table doesn't exist: " + tableName );
@@ -317,6 +367,27 @@ try {
         logError("An error occurred while loading source data: " + ioe.getMessage());
     }
     return null;
+    }
+
+    private LegacySQLTypeName getLegacyType(String typeString) {
+        if (LegacySQLTypeName.BOOLEAN.toString().equals(typeString)) {
+            return LegacySQLTypeName.BOOLEAN;
+        } else if (LegacySQLTypeName.DATE.toString().equals(typeString)) {
+            return LegacySQLTypeName.DATE;
+        } else if (LegacySQLTypeName.DATETIME.toString().equals(typeString)) {
+            return LegacySQLTypeName.DATETIME;
+        } else if (LegacySQLTypeName.FLOAT.toString().equals(typeString)) {
+            return LegacySQLTypeName.FLOAT;
+        } else if (LegacySQLTypeName.INTEGER.toString().equals(typeString)) {
+            return LegacySQLTypeName.INTEGER;
+        } else if (LegacySQLTypeName.STRING.toString().equals(typeString)) {
+            return LegacySQLTypeName.STRING;
+        } else if (LegacySQLTypeName.TIME.toString().equals(typeString)) {
+            return LegacySQLTypeName.TIME;
+        } else if (LegacySQLTypeName.TIMESTAMP.toString().equals(typeString)) {
+            return LegacySQLTypeName.TIMESTAMP;
+        }
+        return null;
     }
 
     public void setDatasetName(String dsn) {
@@ -423,5 +494,26 @@ try {
 
     public Map<String, String> getTableFields() {
         return tableFields;
+    }
+
+    public void allocate(int nrfields) {
+        fieldNames = new String[nrfields];
+        fieldTypes = new String[nrfields];
+    }
+
+    public String[] getFieldNames() {
+        return fieldNames;
+    }
+
+    public void setFieldNames(String[] fn) {
+        fieldNames = fn;
+    }
+
+    public String[] getFieldTypes() {
+        return fieldTypes;
+    }
+
+    public void setFieldTypes(String[] t) {
+        fieldTypes = t;
     }
 }

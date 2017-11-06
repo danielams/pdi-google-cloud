@@ -7,6 +7,11 @@ import org.pentaho.di.job.entry.JobEntryDialogInterface;
 import org.pentaho.di.job.entry.JobEntryInterface;
 import org.pentaho.di.repository.Repository;
 import org.pentaho.di.ui.job.entry.JobEntryDialog;
+import org.pentaho.di.ui.core.widget.ColumnInfo;
+import org.pentaho.di.ui.core.widget.TableView;
+import org.pentaho.di.core.variables.Variables;
+
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
@@ -17,6 +22,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -32,6 +38,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Props;
 import org.pentaho.di.i18n.BaseMessages;
@@ -46,6 +54,8 @@ import org.pentaho.di.ui.core.widget.TextVar;
 import org.pentaho.di.ui.job.dialog.JobDialog;
 import org.pentaho.di.ui.job.entry.JobEntryDialog;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
+
+import com.google.cloud.bigquery.LegacySQLTypeName;
 
 
 public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobEntryDialogInterface {
@@ -105,9 +115,13 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     private Text qName;
     private FormData fqlName,fqName;
 
+    private Label wlFields;
+    private TableView wFields;
+    private FormData fdlFields,fdFields;
+
     private Button wOK, wCancel;
   
-    private Listener lsOK, lsCancel;
+    private Listener lsOK, lsCancel, lsResize;
     
     private Shell shell;
   
@@ -403,6 +417,50 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fqName.right = new FormAttachment( 100, 0 );
         qName.setLayoutData( fqName );
 
+        // FIELDS
+        
+    wlFields = new Label( shell, SWT.NONE );
+    wlFields.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.Fields.Label" ) );
+    props.setLook( wlFields );
+    fdlFields = new FormData();
+    fdlFields.left = new FormAttachment( 0, 0 );
+    fdlFields.top = new FormAttachment( qName, margin );
+    wlFields.setLayoutData( fdlFields );
+
+    final int FieldsCols = 2;
+    final int FieldsRows = 8;
+
+    ColumnInfo[] colinf = new ColumnInfo[FieldsCols];
+    colinf[0] =
+      new ColumnInfo(
+        BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.ColumnInfo.Name" ), ColumnInfo.COLUMN_TYPE_TEXT,
+        false );
+    String types[] = new String[] {
+      LegacySQLTypeName.BOOLEAN.toString(),
+      LegacySQLTypeName.DATE.toString(),
+      LegacySQLTypeName.DATETIME.toString(),
+      LegacySQLTypeName.FLOAT.toString(),
+      LegacySQLTypeName.INTEGER.toString(),
+      LegacySQLTypeName.STRING.toString(),
+      LegacySQLTypeName.TIME.toString(),
+      LegacySQLTypeName.TIMESTAMP.toString()
+    } ;
+    colinf[1] =
+      new ColumnInfo(
+        BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.ColumnInfo.Type" ),
+        ColumnInfo.COLUMN_TYPE_CCOMBO, types);
+
+    wFields =
+      new TableView(
+        jobEntry, shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, colinf, FieldsRows, lsMod, props );
+
+    fdFields = new FormData();
+    fdFields.left = new FormAttachment( 0, 0 );
+    fdFields.top = new FormAttachment( wlFields, margin );
+    fdFields.right = new FormAttachment( 100, 0 );
+    //fdFields.bottom = new FormAttachment( wOK, -2 * margin );
+    wFields.setLayoutData( fdFields );
+
         /*
     wTabFolder = new CTabFolder( shell, SWT.BORDER );
     props.setLook( wTabFolder, Props.WIDGET_STYLE_TAB );
@@ -424,7 +482,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     wCancel = new Button( shell, SWT.PUSH );
     wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
 
-    BaseStepDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel }, margin, qName );
+    BaseStepDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel }, margin, wFields );
 
     // Add listeners
     lsCancel = new Listener() {
@@ -452,6 +510,16 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         cancel();
       }
     } );
+    
+    lsResize = new Listener() {
+      public void handleEvent( Event event ) {
+        Point size = shell.getSize();
+        wFields.setSize( size.x - 10, size.y - 50 );
+        wFields.table.setSize( size.x - 10, size.y - 50 );
+        wFields.redraw();
+      }
+    };
+    shell.addListener( SWT.Resize, lsResize );
 
 
     getData();
@@ -484,6 +552,23 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         sName.setText( Const.nullToEmpty( jobEntry.getSourceUri()) ) ;
         wFileType.setText( Const.nullToEmpty( jobEntry.getFileType()) ) ;
         qName.setText( Const.nullToEmpty( jobEntry.getQuote()) ) ;
+
+        Table table = wFields.table;
+        table.removeAll();
+        for ( int i = 0; i < jobEntry.getFieldNames().length; i++ ) {
+          TableItem ti = new TableItem( table, SWT.NONE );
+          ti.setText( 0, "" + ( i + 1 ) );
+          if ( jobEntry.getFieldNames()[i] != null ) {
+            ti.setText( 1, jobEntry.getFieldNames()[i] );
+          }
+          if ( jobEntry.getFieldTypes()[i] != null ) {
+            ti.setText( 2, jobEntry.getFieldTypes()[i] );
+          }
+        }
+        if ( table.getItemCount() == 0 ) {
+          TableItem ti = new TableItem( table, SWT.NONE );
+          ti.setText( 0, "001" );
+        }
     }
     
   private void ok() {
@@ -507,6 +592,18 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     jobEntry.setSourceUri( sName.getText() );
     jobEntry.setFileType( wFileType.getText() );
     jobEntry.setQuote( qName.getText() );
+    
+    int i;
+    int nrfields = wFields.nrNonEmpty();
+    jobEntry.allocate(nrfields);
+
+    for ( i = 0; i < nrfields; i++ ) {
+      TableItem item = wFields.getNonEmpty( i );
+      jobEntry.getFieldNames()[i] = item.getText( 1 );
+      jobEntry.getFieldTypes()[i] = item.getText( 2 );
+    }
+
+
     dispose();
   }
   
