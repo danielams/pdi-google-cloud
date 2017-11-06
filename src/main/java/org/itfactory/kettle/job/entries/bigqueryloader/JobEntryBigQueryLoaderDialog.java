@@ -58,6 +58,10 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
   
     private FormData fdlName, fdName;
 
+    private Label wlUseContainerAuth;
+    private Button wUseContainerAuth;
+    private FormData fdlUseContainerAuth,fdUseContainerAuth;
+
     private Label dellName;
     private Text delName;
     private FormData fdelName;
@@ -73,14 +77,29 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     private Label dslName;
     private Text dsName;
     private FormData fdslName,fdsName;
+
+    private Label wlCreateDataset;
+    private Button wCreateDataset;
+    private FormData fdlCreateDataset,fdCreateDataset;
     
     private Label tlName;
     private Text tName;
     private FormData ftlName,ftName;
-    
+
+    private Label wlCreateTable;
+    private Button wCreateTable;
+    private FormData fdlCreateTable,fdCreateTable;
+
+    private Label wlFileType;
+    private CCombo wFileType;
+    private FormData fdlFileType,fdFileType;
+
     private Label slName;
     private Text sName;
     private FormData fslName,fsName;
+
+    private LabelTextVar wLeadingRowsToSkip;
+    private FormData fdLeadingRowsToSkip;
     
     private Label qlName;
     private Text qName;
@@ -153,6 +172,25 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fdName.right = new FormAttachment( 100, 0 );
         wName.setLayoutData( fdName );
 
+
+        // use container auth checkbox
+        wlUseContainerAuth = new Label( shell, SWT.RIGHT );
+        wlUseContainerAuth.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.UseContainerAuth.Label" ) );
+        props.setLook( wlUseContainerAuth );
+        fdlUseContainerAuth = new FormData();
+        fdlUseContainerAuth.left = new FormAttachment( 0, 0 );
+        fdlUseContainerAuth.top = new FormAttachment( wName, margin );
+        fdlUseContainerAuth.right = new FormAttachment( middle, -margin );
+        wlUseContainerAuth.setLayoutData( fdlUseContainerAuth );
+        wUseContainerAuth = new Button( shell, SWT.CHECK );
+        props.setLook( wUseContainerAuth );
+        wUseContainerAuth.setToolTipText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.UseContainerAuth.Tooltip" ) );
+        fdUseContainerAuth = new FormData();
+        fdUseContainerAuth.left = new FormAttachment( middle, 0 );
+        fdUseContainerAuth.top = new FormAttachment( wName, margin );
+        fdUseContainerAuth.right = new FormAttachment( 100, 0 );
+        wUseContainerAuth.setLayoutData( fdUseContainerAuth );
+
         // Credentials path
         cplName = new Label( shell, SWT.RIGHT );
         cplName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CredentialsPath.Label" ) );
@@ -160,7 +198,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fcplName = new FormData();
         fcplName.left = new FormAttachment( 0, 0 );
         fcplName.right = new FormAttachment( middle, -margin );
-        fcplName.top = new FormAttachment( wlName, margin );
+        fcplName.top = new FormAttachment( wUseContainerAuth, margin );
         cplName.setLayoutData( fcplName );
         cpName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
         cpName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.CredentialsPath.Tooltip"));
@@ -168,7 +206,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         cpName.addModifyListener( lsMod );
         fcpName = new FormData();
         fcpName.left = new FormAttachment( middle, 0 );
-        fcpName.top = new FormAttachment( wlName, margin );
+        fcpName.top = new FormAttachment( wUseContainerAuth, margin );
         fcpName.right = new FormAttachment( 100, 0 );
         cpName.setLayoutData( fcpName );
 
@@ -210,6 +248,24 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fdsName.right = new FormAttachment( 100, 0 );
         dsName.setLayoutData( fdsName );
 
+        // create dataset checkbox
+        wlCreateDataset = new Label( shell, SWT.RIGHT );
+        wlCreateDataset.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateDataset.Label" ) );
+        props.setLook( wlCreateDataset );
+        fdlCreateDataset = new FormData();
+        fdlCreateDataset.left = new FormAttachment( 0, 0 );
+        fdlCreateDataset.top = new FormAttachment( dsName, margin );
+        fdlCreateDataset.right = new FormAttachment( middle, -margin );
+        wlCreateDataset.setLayoutData( fdlCreateDataset );
+        wCreateDataset = new Button( shell, SWT.CHECK );
+        props.setLook( wCreateDataset );
+        wCreateDataset.setToolTipText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateDataset.Tooltip" ) );
+        fdCreateDataset = new FormData();
+        fdCreateDataset.left = new FormAttachment( middle, 0 );
+        fdCreateDataset.top = new FormAttachment( dsName, margin );
+        fdCreateDataset.right = new FormAttachment( 100, 0 );
+        wCreateDataset.setLayoutData( fdCreateDataset );
+
         // table name
         tlName = new Label( shell, SWT.RIGHT );
         tlName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.Table.Label" ) );
@@ -217,7 +273,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         ftlName = new FormData();
         ftlName.left = new FormAttachment( 0, 0 );
         ftlName.right = new FormAttachment( middle, -margin );
-        ftlName.top = new FormAttachment( dsName, margin );
+        ftlName.top = new FormAttachment( wlCreateDataset, margin );
         tlName.setLayoutData( ftlName );
         tName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
         tName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Table.Tooltip"));
@@ -225,9 +281,28 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         tName.addModifyListener( lsMod );
         ftName = new FormData();
         ftName.left = new FormAttachment( middle, 0 );
-        ftName.top = new FormAttachment( dslName, margin );
+        ftName.top = new FormAttachment( wlCreateDataset, margin );
         ftName.right = new FormAttachment( 100, 0 );
         tName.setLayoutData( ftName );
+
+
+        // create table checkbox
+        wlCreateTable = new Label( shell, SWT.RIGHT );
+        wlCreateTable.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateTable.Label" ) );
+        props.setLook( wlCreateTable );
+        fdlCreateTable = new FormData();
+        fdlCreateTable.left = new FormAttachment( 0, 0 );
+        fdlCreateTable.top = new FormAttachment( tName, margin );
+        fdlCreateTable.right = new FormAttachment( middle, -margin );
+        wlCreateTable.setLayoutData( fdlCreateTable );
+        wCreateTable = new Button( shell, SWT.CHECK );
+        props.setLook( wCreateTable );
+        wCreateTable.setToolTipText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateTable.Tooltip" ) );
+        fdCreateTable = new FormData();
+        fdCreateTable.left = new FormAttachment( middle, 0 );
+        fdCreateTable.top = new FormAttachment( tName, margin );
+        fdCreateTable.right = new FormAttachment( 100, 0 );
+        wCreateTable.setLayoutData( fdCreateTable );
 
         // GCS source URI
         slName = new Label( shell, SWT.RIGHT );
@@ -236,7 +311,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fslName = new FormData();
         fslName.left = new FormAttachment( 0, 0 );
         fslName.right = new FormAttachment( middle, -margin );
-        fslName.top = new FormAttachment( tName, margin );
+        fslName.top = new FormAttachment( wCreateTable, margin );
         slName.setLayoutData( fslName );
         sName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
         sName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Source.Tooltip"));
@@ -244,9 +319,51 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         sName.addModifyListener( lsMod );
         fsName = new FormData();
         fsName.left = new FormAttachment( middle, 0 );
-        fsName.top = new FormAttachment( tName, margin );
+        fsName.top = new FormAttachment( wCreateTable, margin );
         fsName.right = new FormAttachment( 100, 0 );
         sName.setLayoutData( fsName );
+
+        // file type drop down
+        wlFileType = new Label( shell, SWT.RIGHT );
+        wlFileType.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.FileType.Label" ) );
+        props.setLook( wlFileType );
+        fdlFileType = new FormData();
+        fdlFileType.left = new FormAttachment( 0, 0 );
+        fdlFileType.right = new FormAttachment( middle, 0 );
+        fdlFileType.top = new FormAttachment( sName, margin );
+        wlFileType.setLayoutData( fdlFileType );
+        wFileType = new CCombo( shell, SWT.SINGLE | SWT.READ_ONLY | SWT.BORDER );
+        wFileType.add( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.TypeJSON.Label" ) );
+        wFileType.add( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.TypeAvro.Label" ) );
+        wFileType.add( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.TypeCSV.Label" ) );
+        wFileType.select( 0 ); // +1: starts at -1
+
+        props.setLook( wFileType );
+        
+            fdFileType = new FormData();
+            fdFileType.left = new FormAttachment( middle, margin );
+            fdFileType.top = new FormAttachment( sName, margin );
+            fdFileType.right = new FormAttachment( 100, 0 );
+            wFileType.setLayoutData( fdFileType );
+        
+            wFileType.addSelectionListener( new SelectionAdapter() {
+              public void widgetSelected( SelectionEvent e ) {
+        
+              }
+            } );
+
+        // leading rows to skip in csv file (at least 1 if there's a header)
+        wLeadingRowsToSkip =
+        new LabelTextVar(
+          jobMeta, shell, BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.LeadingRowsToSkip.Label" ), BaseMessages
+            .getString( PKG, "GoogleBigQueryStorageLoad.LeadingRowsToSkip.Tooltip" ) );
+        props.setLook( wLeadingRowsToSkip );
+        wLeadingRowsToSkip.addModifyListener( lsMod );
+        fdLeadingRowsToSkip = new FormData();
+        fdLeadingRowsToSkip.left = new FormAttachment( 0, 0 );
+        fdLeadingRowsToSkip.top = new FormAttachment( wFileType, margin );
+        fdLeadingRowsToSkip.right = new FormAttachment( 100, 0 );
+        wLeadingRowsToSkip.setLayoutData( fdLeadingRowsToSkip );
 
         // CSV delimiter
         dellName = new Label( shell, SWT.RIGHT );
@@ -255,7 +372,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         fdelName = new FormData();
         fdelName.left = new FormAttachment( 0, 0 );
         fdelName.right = new FormAttachment( middle, -margin );
-        fdelName.top = new FormAttachment( sName, margin );
+        fdelName.top = new FormAttachment( wLeadingRowsToSkip, margin );
         dellName.setLayoutData( fdelName );
         delName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
         delName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Delimiter.Tooltip"));
@@ -263,7 +380,7 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         delName.addModifyListener( lsMod );
         fdelName = new FormData();
         fdelName.left = new FormAttachment( middle, 0 );
-        fdelName.top = new FormAttachment( sName, margin );
+        fdelName.top = new FormAttachment( wLeadingRowsToSkip, margin );
         fdelName.right = new FormAttachment( 100, 0 );
         delName.setLayoutData( fdelName );
 
@@ -355,12 +472,17 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     
     public void getData() {
         wName.setText( Const.nullToEmpty( jobEntry.getName() ) );
+        wUseContainerAuth.setSelection( jobEntry.getUseContainerSecurity() );
         cpName.setText( Const.nullToEmpty( jobEntry.getCredentialsPath() ) );
         pName.setText( Const.nullToEmpty( jobEntry.getProjectId() ) );
         delName.setText( Const.nullToEmpty( jobEntry.getDelimiter() ) );
         dsName.setText( Const.nullToEmpty( jobEntry.getDatasetName() ) );
+        wCreateDataset.setSelection( jobEntry.getCreateDataset() );
         tName.setText( Const.nullToEmpty( jobEntry.getTableName() ) );
+        wCreateTable.setSelection( jobEntry.getCreateTable() );
+        wLeadingRowsToSkip.setText( "" + jobEntry.getLeadingRowsToSkip() );
         sName.setText( Const.nullToEmpty( jobEntry.getSourceUri()) ) ;
+        wFileType.setText( Const.nullToEmpty( jobEntry.getFileType()) ) ;
         qName.setText( Const.nullToEmpty( jobEntry.getQuote()) ) ;
     }
     
@@ -373,12 +495,17 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
       return;
     }
     jobEntry.setName( wName.getText() );
+    jobEntry.setUseContainerSecurity(wUseContainerAuth.getSelection() );
     jobEntry.setCredentialsPath(cpName.getText() );
     jobEntry.setProjectId( pName.getText() );
     jobEntry.setDelimiter( delName.getText() );
     jobEntry.setDatasetName( dsName.getText() );
+    jobEntry.setCreateDataset( wCreateDataset.getSelection() );
     jobEntry.setTableName( tName.getText() );
+    jobEntry.setCreateTable( wCreateTable.getSelection() );
+    jobEntry.setLeadingRowsToSkip(Const.toInt( wLeadingRowsToSkip.getText(), 1 ) );
     jobEntry.setSourceUri( sName.getText() );
+    jobEntry.setFileType( wFileType.getText() );
     jobEntry.setQuote( qName.getText() );
     dispose();
   }

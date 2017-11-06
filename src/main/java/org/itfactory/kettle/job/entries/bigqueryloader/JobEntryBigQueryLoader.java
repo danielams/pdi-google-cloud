@@ -58,6 +58,10 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
 
     private static Class<?> PKG = JobEntryBigQueryLoader.class;
 
+    public static final String TYPE_JSON = "JSON";
+    public static final String TYPE_CSV = "CSV";
+    public static final String TYPE_AVRO = "Avro";
+
     private boolean useContainerSecurity = false;
     private String credentialsPath = "C:/Users/afowler/Documents/Apps/google-cloud/BigQueryTesting-fd7a2959ea0f.json";
     private String projectId = "bigquery-testing-184814";
@@ -66,6 +70,7 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
     private String sourceUri = "gs://adam-csv-data/sample-age-data.csv";
     private boolean createDataset = true;
     private boolean createTable = true;
+    private String fileType = TYPE_CSV;
     private String delimiter = ",";
     private String quote = "\"";
     private int leadingRowsToSkip = 1;
@@ -120,6 +125,7 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
         retval.append( "      " ).append( XMLHandler.addTagValue( "quote", quote ) );
         retval.append( "      " ).append( XMLHandler.addTagValue( "createDataset", createDataset?"Y":"N" ) );
         retval.append( "      " ).append( XMLHandler.addTagValue( "createTable", createTable?"Y":"N" ) );
+        retval.append( "      " ).append( XMLHandler.addTagValue( "fileType", fileType) );
         retval.append( "      " ).append( XMLHandler.addTagValue( "leadingRowsToSkip", leadingRowsToSkip ) );
     
         return retval.toString();
@@ -129,7 +135,12 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
       Repository rep, IMetaStore metaStore ) throws KettleXMLException {
         try {
             super.loadXML( entrynode, databases, slaveServers );
-            useContainerSecurity = "Y".equals(XMLHandler.getTagValue( entrynode, "useContainerSecurity" ));
+            String ucs = XMLHandler.getTagValue( entrynode, "useContainerSecurity" );
+            if (null == ucs || "".equals(ucs.trim())) {
+                useContainerSecurity = true;
+            } else {
+                useContainerSecurity = "Y".equals(ucs);
+            }
             projectId = XMLHandler.getTagValue( entrynode, "projectId" );
             credentialsPath = XMLHandler.getTagValue( entrynode, "credentialsPath" );
             datasetName = XMLHandler.getTagValue( entrynode, "datasetName" );
@@ -161,6 +172,12 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             } else {
                 createTable = "Y".equals(ct);
             }
+            String ft = XMLHandler.getTagValue( entrynode, "fileType" );
+            if (null == ct || "".equals(ct.trim())) {
+                fileType = TYPE_JSON;
+            } else {
+                fileType = ft;
+            }
 
             leadingRowsToSkip = Const.toInt( XMLHandler.getTagValue( entrynode, "leadingRowsToSkip" ),1);
         } catch ( KettleXMLException xe ) {
@@ -182,6 +199,7 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             quote = rep.getJobEntryAttributeString( id_jobentry, "quote" );
             createDataset = rep.getJobEntryAttributeBoolean( id_jobentry, "createDataset" );
             createTable = rep.getJobEntryAttributeBoolean( id_jobentry, "createTable" );
+            fileType = rep.getJobEntryAttributeString( id_jobentry, "fileType" );
             leadingRowsToSkip = (int)rep.getJobEntryAttributeInteger(id_jobentry,"leadingRowsToSkip");
 
         } catch ( KettleException dbe ) {
@@ -203,6 +221,7 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
             rep.saveJobEntryAttribute( id_job, getObjectId(), "quote", quote );
             rep.saveJobEntryAttribute( id_job, getObjectId(), "createDataset", createDataset );
             rep.saveJobEntryAttribute( id_job, getObjectId(), "createTable", createTable );
+            rep.saveJobEntryAttribute( id_job, getObjectId(), "fileType", fileType );
             rep.saveJobEntryAttribute( id_job, getObjectId(), "leadingRowsToSkip", leadingRowsToSkip );
 
         } catch ( KettleDatabaseException dbe ) {
@@ -216,7 +235,11 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
 try {
         // switch on auth type
         if (useContainerSecurity) {
-            bigquery = BigQueryOptions.getDefaultInstance().getService();
+            BigQueryOptions options = BigQueryOptions.newBuilder()
+            .setProjectId(projectId)
+            .build();
+            //bigquery = BigQueryOptions.getDefaultInstance().getService();
+            bigquery = options.getService();
         } else {
             
             BigQueryOptions options = BigQueryOptions.newBuilder()
@@ -262,7 +285,16 @@ try {
         }
 
         //Job loadJob = table.load(FormatOptions.csv(), sourceUri);
-        Job loadJob = table.load(CsvOptions.newBuilder().setFieldDelimiter(delimiter).setQuote(quote).setSkipLeadingRows(leadingRowsToSkip).build(), sourceUri);
+        Job loadJob;
+        if (TYPE_CSV.equals(fileType)) {
+            loadJob = table.load(CsvOptions.newBuilder().setFieldDelimiter(delimiter).setQuote(quote)
+                .setSkipLeadingRows(leadingRowsToSkip).build(), sourceUri);
+        } else if (TYPE_AVRO.equals(fileType)) {
+            loadJob = table.load(FormatOptions.avro(),sourceUri);
+        } else {
+            // JSON
+            loadJob = table.load(FormatOptions.json(),sourceUri);
+        }
 
         try {
             loadJob = loadJob.waitFor();
@@ -325,6 +357,14 @@ try {
 
     public void setCreateTable(boolean doit) {
         createTable = doit;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String ft) {
+        fileType = ft;
     }
 
     public void setDelimiter(String delim) {
