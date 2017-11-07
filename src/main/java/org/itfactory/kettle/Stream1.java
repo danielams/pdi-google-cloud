@@ -18,7 +18,6 @@ public class Stream1 {
         String datasetName = "streamdata";
         String tableName = "ages";
 
-        int leadingRowsToSkip = 1;
         boolean createDataset = true;
         boolean createTable = true;
         try {

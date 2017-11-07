@@ -26,7 +26,7 @@ import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
 
-import com.google.cloud.bigquery.InsertAllRequest;
+import com.google.cloud.bigquery.*;
 
 /**
  * @author afowler
@@ -44,8 +44,11 @@ public class BigQueryStreamData extends BaseStepData implements StepDataInterfac
     public Object[] values;
     public Object[] fieldNames;
 
-    // big query specific temporaries (for streaming)
-    InsertAllRequest insertBuilder;
+    // bigquery stream state variables
+    public BigQuery bigquery;
+    public TableId tableId;
+    public InsertAllRequest.Builder insertBuilder;
+    public int batchCounter = 0;
 
     public BigQueryStreamData() {
         super();

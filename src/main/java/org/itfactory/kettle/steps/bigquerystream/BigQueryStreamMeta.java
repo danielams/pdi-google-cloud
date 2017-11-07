@@ -35,6 +35,7 @@ image = "BigQueryStreamOutput.svg",
  i18nPackageName = "org.itfactory.kettle.steps.bigquerystream", name = "BigQueryStream.Name",
  description = "BigQueryStream.Description",
  categoryDescription = "i18n:org.pentaho.di.steps:StepCategory.Category.BigData" )
+ 
 public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterface {
     private static Class<?> PKG = BigQueryStreamMeta.class; // for i18n purposes, needed by Translator2!!
 
@@ -67,6 +68,12 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
     */
     return retval;
   }
+  
+  @Override
+  public void getFields( RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space ) {
+    // we don't add any, so leave blank
+  }
+
 
   private void readData( Node entrynode ) throws KettleXMLException {
     try {
@@ -114,7 +121,7 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
       }
     } catch ( Exception e ) {
       throw new KettleXMLException( BaseMessages.getString(
-        PKG, "FieldAnalysisMeta.Exception.UnableToLoadStepInfo" ), e );
+        PKG, "BigQueryStreamMeta.Exception.UnableToLoadStepInfo" ), e );
     }
   }
 

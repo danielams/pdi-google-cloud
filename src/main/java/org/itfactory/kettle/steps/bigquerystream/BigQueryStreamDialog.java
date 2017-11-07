@@ -336,7 +336,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
    * Copy information from the meta-data input to the dialog fields.
    */
   public void getData() {
-    wName.setText( Const.nullToEmpty( input.getName() ) );
+    wName.setText( Const.nullToEmpty( stepname) );
     wUseContainerAuth.setSelection( input.getUseContainerSecurity() );
     cpName.setText( Const.nullToEmpty( input.getCredentialsPath() ) );
     pName.setText( Const.nullToEmpty( input.getProjectId() ) );
@@ -364,7 +364,8 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
         mb.open();
       return;
     }
-    input.setName( wName.getText() );
+    stepname = wName.getText();
+    //input.setName( wName.getText() );
     input.setUseContainerSecurity(wUseContainerAuth.getSelection() );
     input.setCredentialsPath(cpName.getText() );
     input.setProjectId( pName.getText() );
