@@ -88,7 +88,6 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
   private Listener lsOK, lsCancel, lsResize;
   
-  private Shell shell;
 
   private SelectionAdapter lsDef;
 
@@ -122,14 +121,14 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       formLayout.marginHeight = Const.FORM_MARGIN;
   
       shell.setLayout( formLayout );
-      shell.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.Title" ) );
+      shell.setText( BaseMessages.getString( PKG, "BigQueryStream.Title" ) );
   
       int middle = props.getMiddlePct();
       int margin = Const.MARGIN;
   
       // Step Name
       wlName = new Label( shell, SWT.RIGHT );
-      wlName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.Name.Label" ) );
+      wlName.setText( BaseMessages.getString( PKG, "BigQueryStream.Name.Label" ) );
       props.setLook( wlName );
       fdlName = new FormData();
       fdlName.left = new FormAttachment( 0, 0 );
@@ -137,7 +136,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       fdlName.top = new FormAttachment( 0, margin );
       wlName.setLayoutData( fdlName );
       wName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER  );
-      wName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Name.Tooltip"));
+      wName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Name.Tooltip"));
       props.setLook( wName );
       wName.addModifyListener( lsMod );
       fdName = new FormData();
@@ -149,7 +148,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
       // use container auth checkbox
       wlUseContainerAuth = new Label( shell, SWT.RIGHT );
-      wlUseContainerAuth.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.UseContainerAuth.Label" ) );
+      wlUseContainerAuth.setText( BaseMessages.getString( PKG, "BigQueryStream.UseContainerAuth.Label" ) );
       props.setLook( wlUseContainerAuth );
       fdlUseContainerAuth = new FormData();
       fdlUseContainerAuth.left = new FormAttachment( 0, 0 );
@@ -158,7 +157,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       wlUseContainerAuth.setLayoutData( fdlUseContainerAuth );
       wUseContainerAuth = new Button( shell, SWT.CHECK );
       props.setLook( wUseContainerAuth );
-      wUseContainerAuth.setToolTipText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.UseContainerAuth.Tooltip" ) );
+      wUseContainerAuth.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.UseContainerAuth.Tooltip" ) );
       fdUseContainerAuth = new FormData();
       fdUseContainerAuth.left = new FormAttachment( middle, 0 );
       fdUseContainerAuth.top = new FormAttachment( wName, margin );
@@ -167,7 +166,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
       // Credentials path
       cplName = new Label( shell, SWT.RIGHT );
-      cplName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CredentialsPath.Label" ) );
+      cplName.setText( BaseMessages.getString( PKG, "BigQueryStream.CredentialsPath.Label" ) );
       props.setLook( cplName );
       fcplName = new FormData();
       fcplName.left = new FormAttachment( 0, 0 );
@@ -175,7 +174,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       fcplName.top = new FormAttachment( wUseContainerAuth, margin );
       cplName.setLayoutData( fcplName );
       cpName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      cpName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.CredentialsPath.Tooltip"));
+      cpName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.CredentialsPath.Tooltip"));
       props.setLook( cpName );
       cpName.addModifyListener( lsMod );
       fcpName = new FormData();
@@ -186,7 +185,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
       // BigQuery Project Id
       plName = new Label( shell, SWT.RIGHT );
-      plName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.Project.Label" ) );
+      plName.setText( BaseMessages.getString( PKG, "BigQueryStream.Project.Label" ) );
       props.setLook( plName );
       fplName = new FormData();
       fplName.left = new FormAttachment( 0, 0 );
@@ -194,7 +193,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       fplName.top = new FormAttachment( cpName, margin );
       plName.setLayoutData( fplName );
       pName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      pName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Project.Tooltip"));
+      pName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Project.Tooltip"));
       props.setLook( pName );
       pName.addModifyListener( lsMod );
       fpName = new FormData();
@@ -205,7 +204,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
       // BigQuery dataset name
       dslName = new Label( shell, SWT.RIGHT );
-      dslName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.DataSet.Label" ) );
+      dslName.setText( BaseMessages.getString( PKG, "BigQueryStream.DataSet.Label" ) );
       props.setLook( dslName );
       fdslName = new FormData();
       fdslName.left = new FormAttachment( 0, 0 );
@@ -213,7 +212,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       fdslName.top = new FormAttachment( pName, margin );
       dslName.setLayoutData( fdslName );
       dsName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      dsName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.DataSet.Tooltip"));
+      dsName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.DataSet.Tooltip"));
       props.setLook( dsName );
       dsName.addModifyListener( lsMod );
       fdsName = new FormData();
@@ -224,7 +223,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
       // create dataset checkbox
       wlCreateDataset = new Label( shell, SWT.RIGHT );
-      wlCreateDataset.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateDataset.Label" ) );
+      wlCreateDataset.setText( BaseMessages.getString( PKG, "BigQueryStream.CreateDataset.Label" ) );
       props.setLook( wlCreateDataset );
       fdlCreateDataset = new FormData();
       fdlCreateDataset.left = new FormAttachment( 0, 0 );
@@ -233,7 +232,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       wlCreateDataset.setLayoutData( fdlCreateDataset );
       wCreateDataset = new Button( shell, SWT.CHECK );
       props.setLook( wCreateDataset );
-      wCreateDataset.setToolTipText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateDataset.Tooltip" ) );
+      wCreateDataset.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.CreateDataset.Tooltip" ) );
       fdCreateDataset = new FormData();
       fdCreateDataset.left = new FormAttachment( middle, 0 );
       fdCreateDataset.top = new FormAttachment( dsName, margin );
@@ -242,7 +241,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
       // table name
       tlName = new Label( shell, SWT.RIGHT );
-      tlName.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.Table.Label" ) );
+      tlName.setText( BaseMessages.getString( PKG, "BigQueryStream.Table.Label" ) );
       props.setLook( tlName );
       ftlName = new FormData();
       ftlName.left = new FormAttachment( 0, 0 );
@@ -250,7 +249,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       ftlName.top = new FormAttachment( wlCreateDataset, margin );
       tlName.setLayoutData( ftlName );
       tName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      tName.setToolTipText(BaseMessages.getString(PKG, "GoogleBigQueryStorageLoad.Table.Tooltip"));
+      tName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Table.Tooltip"));
       props.setLook( tName );
       tName.addModifyListener( lsMod );
       ftName = new FormData();
@@ -262,7 +261,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
       // create table checkbox
       wlCreateTable = new Label( shell, SWT.RIGHT );
-      wlCreateTable.setText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateTable.Label" ) );
+      wlCreateTable.setText( BaseMessages.getString( PKG, "BigQueryStream.CreateTable.Label" ) );
       props.setLook( wlCreateTable );
       fdlCreateTable = new FormData();
       fdlCreateTable.left = new FormAttachment( 0, 0 );
@@ -271,7 +270,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
       wlCreateTable.setLayoutData( fdlCreateTable );
       wCreateTable = new Button( shell, SWT.CHECK );
       props.setLook( wCreateTable );
-      wCreateTable.setToolTipText( BaseMessages.getString( PKG, "GoogleBigQueryStorageLoad.CreateTable.Tooltip" ) );
+      wCreateTable.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.CreateTable.Tooltip" ) );
       fdCreateTable = new FormData();
       fdCreateTable.left = new FormAttachment( middle, 0 );
       fdCreateTable.top = new FormAttachment( tName, margin );
@@ -345,8 +344,8 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
     tName.setText( Const.nullToEmpty( input.getTableName() ) );
     wCreateTable.setSelection( input.getCreateTable() );
 
-    wStepname.selectAll();
-    wStepname.setFocus();
+    wName.selectAll();
+    wName.setFocus();
   }
 
   
@@ -357,7 +356,7 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
   }
 
   private void ok() {
-    if ( null == wStepname.getText() || "".equals(wStepname.getText().trim()) ) {
+    if ( null == wName.getText() || "".equals(wName.getText().trim()) ) {
         MessageBox mb = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
         mb.setText( BaseMessages.getString( PKG, "System.StepJobEntryNameMissing.Title" ) );
         mb.setMessage( BaseMessages.getString( PKG, "System.JobEntryNameMissing.Msg" ) );

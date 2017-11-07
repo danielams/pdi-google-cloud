@@ -196,12 +196,12 @@ public class BigQueryStream extends BaseStep implements StepInterface {
     } // end if for first row (initialisation based on row data)
 
     // Do something to this row's data (create row for BigQuery, and append to current stream)
-    RowMetaInterface inputRowMeta = getInputRowMeta();
+    data.inputRowMeta = getInputRowMeta();
     int numFields = data.inputRowMeta.getFieldNames().length;
     
     Map<String, Object> rowContent = new HashMap<String,Object>();
     for ( int i = 0; i < numFields; i++ ) {
-        ValueMetaInterface valueMeta = inputRowMeta.getValueMeta( i );
+        ValueMetaInterface valueMeta = data.inputRowMeta.getValueMeta( i );
         Object valueData = r[i];
 
         // Copy field name and value to BigQuery field
@@ -217,9 +217,12 @@ public class BigQueryStream extends BaseStep implements StepInterface {
 
     //Object extraValue = new ValueMetaAndData();
     
-    Object[] outputRow = RowDataUtil.addValueData( r, data.outputRowMeta.size() - 1, null );
+    //Object[] outputRow = RowDataUtil.addValueData( r, data.outputRowMeta.size() - 1 );
     
-    putRow( data.outputRowMeta, outputRow );   
+    //putRow( data.outputRowMeta, outputRow ); 
+    
+    putRow( data.outputRowMeta, r );  
+    
 
     if ( checkFeedback( getLinesRead() ) ) {
       if ( log.isBasic() ) {
