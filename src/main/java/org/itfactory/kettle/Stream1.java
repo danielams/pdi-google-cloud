@@ -1,3 +1,25 @@
+/*! ******************************************************************************
+ *
+ * Pentaho Data Integration
+ *
+ * Copyright (C) 2002-2017 by Pentaho : http://www.pentaho.com
+ *
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
+
 package org.itfactory.kettle;
 
 import com.google.cloud.bigquery.*;
@@ -12,44 +34,49 @@ import java.util.Map.Entry;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * First test app for streaming data from an array of row data to google bigquery
+ * 
+ * @author afowler
+ * @since 06-11-2017
+ */
 public class Stream1 {
-    public static void main(String[] args) {
-        System.out.println("In main of Stream1");
-        String datasetName = "streamdata";
-        String tableName = "ages";
+  public static void main(String[] args) {
+    System.out.println("In main of Stream1");
+    String datasetName = "streamdata";
+    String tableName = "ages";
 
-        boolean createDataset = true;
-        boolean createTable = true;
-        try {
+    boolean createDataset = true;
+    boolean createTable = true;
+    try {
 
-        BigQueryOptions options = BigQueryOptions.newBuilder()
-        .setProjectId("bigquery-testing-184814")
+      BigQueryOptions options = BigQueryOptions.newBuilder().setProjectId("bigquery-testing-184814")
         .setCredentials(GoogleCredentials.fromStream(
-          new FileInputStream("C:/Users/afowler/Documents/Apps/google-cloud/BigQueryTesting-fd7a2959ea0f.json"))
-        ).build();
-        BigQuery bigquery = options.getService();
+          new FileInputStream("C:/Users/afowler/Documents/Apps/google-cloud/BigQueryTesting-fd7a2959ea0f.json")))
+        .build();
+      BigQuery bigquery = options.getService();
 
-        DatasetInfo datasetInfo = Dataset.of(datasetName);
-        Dataset dataset = bigquery.getDataset(datasetInfo.getDatasetId());
+      DatasetInfo datasetInfo = Dataset.of(datasetName);
+      Dataset dataset = bigquery.getDataset(datasetInfo.getDatasetId());
 
-        if (dataset == null) {
-            if (createDataset) {
-                System.out.println("Creating dataset");
-                dataset = bigquery.create(datasetInfo);
-            } else {
-                System.out.println("Please create the dataset: " + datasetName);
-                System.exit(1);
-            }
+      if (dataset == null) {
+        if (createDataset) {
+          System.out.println("Creating dataset");
+          dataset = bigquery.create(datasetInfo);
+        } else {
+          System.out.println("Please create the dataset: " + datasetName);
+          System.exit(1);
         }
+      }
 
-        TableId tableId = TableId.of(dataset.getDatasetId().getDataset(), tableName);
-        Table table = bigquery.getTable(tableId);
+      TableId tableId = TableId.of(dataset.getDatasetId().getDataset(), tableName);
+      Table table = bigquery.getTable(tableId);
 
-        if (table == null) {
-            if (createTable) {
-                System.out.println("Creating table");
-            List<Field> fieldList = new ArrayList<Field>();
-            /*
+      if (table == null) {
+        if (createTable) {
+          System.out.println("Creating table");
+          List<Field> fieldList = new ArrayList<Field>();
+          /*
             fieldList.add(Field.of("product_id", LegacySQLTypeName.STRING));
             fieldList.add(Field.of("facility_id", LegacySQLTypeName.STRING));
             fieldList.add(Field.of("customer_id", LegacySQLTypeName.STRING));
@@ -61,78 +88,75 @@ public class Stream1 {
             fieldList.add(Field.of("lgd", LegacySQLTypeName.FLOAT));
             fieldList.add(Field.of("maturity", LegacySQLTypeName.FLOAT));
             */
-            // sales_data.csv fields - BigQuery import doesn't like this data for some reason... nulls???
-            /*
-            fieldList.add(Field.of("ORDERNUMBER", LegacySQLTypeName.INTEGER));
-            fieldList.add(Field.of("QUANTITYORDERED", LegacySQLTypeName.INTEGER));
-            fieldList.add(Field.of("PRICEEACH", LegacySQLTypeName.FLOAT));
-            fieldList.add(Field.of("ORDERLINENUMBER", LegacySQLTypeName.INTEGER));
-            fieldList.add(Field.of("SALES", LegacySQLTypeName.FLOAT));
-            fieldList.add(Field.of("ORDERDATE", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("STATUS", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("QTR_ID", LegacySQLTypeName.INTEGER));
-            fieldList.add(Field.of("MONTH_ID", LegacySQLTypeName.INTEGER));
-            fieldList.add(Field.of("YEAR_ID", LegacySQLTypeName.INTEGER));
-            fieldList.add(Field.of("PRODUCTLINE", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("MSRP", LegacySQLTypeName.FLOAT));
-            fieldList.add(Field.of("PRODUCTCODE", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("CUSTOMERNAME", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("PHONE", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("ADDRESSLINE1", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("ADDRESSLINE2", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("CITY", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("STATE", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("POSTALCODE", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("COUNTRY", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("TERRITORY", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("CONTACTLASTNAME", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("CONTACTFIRSTNAME", LegacySQLTypeName.STRING));
-            */
-            // sample age data csv
-            fieldList.add(Field.of("Name", LegacySQLTypeName.STRING));
-            fieldList.add(Field.of("Age", LegacySQLTypeName.INTEGER));
+          // sales_data.csv fields - BigQuery import doesn't like this data for some reason... nulls???
+          /*
+          fieldList.add(Field.of("ORDERNUMBER", LegacySQLTypeName.INTEGER));
+          fieldList.add(Field.of("QUANTITYORDERED", LegacySQLTypeName.INTEGER));
+          fieldList.add(Field.of("PRICEEACH", LegacySQLTypeName.FLOAT));
+          fieldList.add(Field.of("ORDERLINENUMBER", LegacySQLTypeName.INTEGER));
+          fieldList.add(Field.of("SALES", LegacySQLTypeName.FLOAT));
+          fieldList.add(Field.of("ORDERDATE", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("STATUS", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("QTR_ID", LegacySQLTypeName.INTEGER));
+          fieldList.add(Field.of("MONTH_ID", LegacySQLTypeName.INTEGER));
+          fieldList.add(Field.of("YEAR_ID", LegacySQLTypeName.INTEGER));
+          fieldList.add(Field.of("PRODUCTLINE", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("MSRP", LegacySQLTypeName.FLOAT));
+          fieldList.add(Field.of("PRODUCTCODE", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("CUSTOMERNAME", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("PHONE", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("ADDRESSLINE1", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("ADDRESSLINE2", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("CITY", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("STATE", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("POSTALCODE", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("COUNTRY", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("TERRITORY", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("CONTACTLASTNAME", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("CONTACTFIRSTNAME", LegacySQLTypeName.STRING));
+          */
+          // sample age data csv
+          fieldList.add(Field.of("Name", LegacySQLTypeName.STRING));
+          fieldList.add(Field.of("Age", LegacySQLTypeName.INTEGER));
 
+          Schema schema = Schema.of(fieldList);
 
-            Schema schema = Schema.of(fieldList);
-
-            table = bigquery.create(TableInfo.of(tableId, StandardTableDefinition.of(schema)));
+          table = bigquery.create(TableInfo.of(tableId, StandardTableDefinition.of(schema)));
         } else {
-            System.out.println("Please create the table: " + tableName);
-            System.exit(1);
+          System.out.println("Please create the table: " + tableName);
+          System.exit(1);
         }
-    } // end table null if
+      } // end table null if
 
-// stream results here
-System.out.println("Writing rows to BigQuery");
+      // stream results here
+      System.out.println("Writing rows to BigQuery");
 
-//TableId tableId = TableId.of(datasetName, tableName);
-// Values of the row to insert
-Map<String, Object> rowContent1 = new HashMap<String,Object>();
-rowContent1.put("Name", "AF");
-rowContent1.put("Age", 36);
-Map<String, Object> rowContent2 = new HashMap<String,Object>();
-rowContent2.put("Name", "WF");
-rowContent2.put("Age", 30);
-// Records are passed as a map
-InsertAllRequest insertBuilder = InsertAllRequest.newBuilder(tableId)
-.addRow("34", rowContent2)
-.addRow("35", rowContent1)
-    // More rows can be added in the same RPC by invoking .addRow() on the builder
-    .build();
-InsertAllResponse response = bigquery.insertAll(insertBuilder);
-if (response.hasErrors()) {
-  // If any of the insertions failed, this lets you inspect the errors
-  for (Entry<Long, List<BigQueryError>> entry : response.getInsertErrors().entrySet()) {
-    // inspect row error
-    System.out.println(entry.toString());
-  }
-}
-System.out.println("Stream1 completed");
+      //TableId tableId = TableId.of(datasetName, tableName);
+      // Values of the row to insert
+      Map<String, Object> rowContent1 = new HashMap<String, Object>();
+      rowContent1.put( "Name", "AF" );
+      rowContent1.put( "Age", 36 );
+      Map<String, Object> rowContent2 = new HashMap<String, Object>();
+      rowContent2.put( "Name", "WF" );
+      rowContent2.put( "Age", 30 );
+      // Records are passed as a map
+      InsertAllRequest insertBuilder = InsertAllRequest.newBuilder(tableId).addRow("34", rowContent2)
+        .addRow( "35", rowContent1 )
+        // More rows can be added in the same RPC by invoking .addRow() on the builder
+        .build();
+      InsertAllResponse response = bigquery.insertAll(insertBuilder);
+      if ( response.hasErrors() ) {
+        // If any of the insertions failed, this lets you inspect the errors
+        for ( Entry<Long, List<BigQueryError>> entry : response.getInsertErrors().entrySet() ) {
+          // inspect row error
+          System.out.println( entry.toString() );
+        }
+      }
+      System.out.println("Stream1 completed");
 
-
-} catch (IOException ioe) {
-    ioe.printStackTrace(System.out);
-}
-System.out.println("End of Stream1");
+    } catch (IOException ioe) {
+      ioe.printStackTrace(System.out);
+    }
+    System.out.println("End of Stream1");
   } // end main function
 } // end class

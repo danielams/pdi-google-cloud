@@ -1,6 +1,33 @@
-
+/*! ******************************************************************************
+ *
+ * Pentaho Data Integration
+ *
+ * Copyright (C) 2002-2017 by Pentaho : http://www.pentaho.com
+ *
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
 
 package org.itfactory.kettle.steps.bigquerystream;
+
+import org.pentaho.di.core.Const;
+import org.pentaho.di.i18n.BaseMessages;
+import org.pentaho.di.trans.TransMeta;
+import org.pentaho.di.trans.step.BaseStepMeta;
+import org.pentaho.di.trans.step.StepDialogInterface;
+import org.pentaho.di.ui.trans.step.BaseStepDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -9,7 +36,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -20,22 +46,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.pentaho.di.core.Const;
-import org.pentaho.di.core.util.Utils;
-import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.row.RowMetaInterface;
-import org.pentaho.di.i18n.BaseMessages;
-import org.pentaho.di.trans.TransMeta;
-import org.pentaho.di.trans.step.BaseStepMeta;
-import org.pentaho.di.trans.step.StepDialogInterface;
-import org.pentaho.di.ui.core.dialog.ErrorDialog;
-import org.pentaho.di.ui.core.widget.ColumnInfo;
-import org.pentaho.di.ui.core.widget.TableView;
-import org.pentaho.di.ui.trans.step.BaseStepDialog;
 
+/**
+ * Dialog box for the BigQuery stream loading step
+ * 
+ * @author afowler
+ * @since 06-11-2017
+ */
 public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogInterface {
   private static Class<?> PKG = BigQueryStreamMeta.class; // for i18n purposes, needed by Translator2!!
 
@@ -74,10 +92,6 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
   private Button wCreateTable;
   private FormData fdlCreateTable,fdCreateTable;
 
-  
-  private Label qlName;
-  private Text qName;
-  private FormData fqlName,fqName;
 /*
   private Label wlFields;
   private TableView wFields;
@@ -86,19 +100,23 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
   private Button wOK, wCancel;
 
-  private Listener lsOK, lsCancel, lsResize;
-  
+  private Listener lsOK, lsCancel;
 
   private SelectionAdapter lsDef;
 
-
   private boolean changed = false;
 
+  /**
+   * Standard PDI dialog constructor
+   */
   public BigQueryStreamDialog( Shell parent, Object in, TransMeta tr, String sname ) {
     super( parent, (BaseStepMeta) in, tr, sname );
     input = (BigQueryStreamMeta) in;
   }
 
+  /**
+   * Initialises and displays the dialog box
+   */
   public String open() {
     Shell parent = getParent();
     Display display = parent.getDisplay();
@@ -109,176 +127,172 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
 
 
     ModifyListener lsMod = new ModifyListener() {
-        public void modifyText( ModifyEvent e ) {
-          //sftpclient = null;
-          input.setChanged();
-        }
-      };
-      changed = input.hasChanged();
+      public void modifyText( ModifyEvent e ) {
+        input.setChanged();
+      }
+    };
+    changed = input.hasChanged();
   
-      FormLayout formLayout = new FormLayout();
-      formLayout.marginWidth = Const.FORM_MARGIN;
-      formLayout.marginHeight = Const.FORM_MARGIN;
+    FormLayout formLayout = new FormLayout();
+    formLayout.marginWidth = Const.FORM_MARGIN;
+    formLayout.marginHeight = Const.FORM_MARGIN;
   
-      shell.setLayout( formLayout );
-      shell.setText( BaseMessages.getString( PKG, "BigQueryStream.Title" ) );
+    shell.setLayout( formLayout );
+    shell.setText( BaseMessages.getString( PKG, "BigQueryStream.Title" ) );
   
-      int middle = props.getMiddlePct();
-      int margin = Const.MARGIN;
+    int middle = props.getMiddlePct();
+    int margin = Const.MARGIN;
   
-      // Step Name
-      wlName = new Label( shell, SWT.RIGHT );
-      wlName.setText( BaseMessages.getString( PKG, "BigQueryStream.Name.Label" ) );
-      props.setLook( wlName );
-      fdlName = new FormData();
-      fdlName.left = new FormAttachment( 0, 0 );
-      fdlName.right = new FormAttachment( middle, -margin );
-      fdlName.top = new FormAttachment( 0, margin );
-      wlName.setLayoutData( fdlName );
-      wName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER  );
-      wName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Name.Tooltip"));
-      props.setLook( wName );
-      wName.addModifyListener( lsMod );
-      fdName = new FormData();
-      fdName.left = new FormAttachment( middle, 0 );
-      fdName.top = new FormAttachment( 0, margin );
-      fdName.right = new FormAttachment( 100, 0 );
-      wName.setLayoutData( fdName );
+    // Step Name
+    wlName = new Label( shell, SWT.RIGHT );
+    wlName.setText( BaseMessages.getString( PKG, "BigQueryStream.Name.Label" ) );
+    props.setLook( wlName );
+    fdlName = new FormData();
+    fdlName.left = new FormAttachment( 0, 0 );
+    fdlName.right = new FormAttachment( middle, -margin );
+    fdlName.top = new FormAttachment( 0, margin );
+    wlName.setLayoutData( fdlName );
+    wName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER  );
+    wName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Name.Tooltip"));
+    props.setLook( wName );
+    wName.addModifyListener( lsMod );
+    fdName = new FormData();
+    fdName.left = new FormAttachment( middle, 0 );
+    fdName.top = new FormAttachment( 0, margin );
+    fdName.right = new FormAttachment( 100, 0 );
+    wName.setLayoutData( fdName );
 
 
-      // use container auth checkbox
-      wlUseContainerAuth = new Label( shell, SWT.RIGHT );
-      wlUseContainerAuth.setText( BaseMessages.getString( PKG, "BigQueryStream.UseContainerAuth.Label" ) );
-      props.setLook( wlUseContainerAuth );
-      fdlUseContainerAuth = new FormData();
-      fdlUseContainerAuth.left = new FormAttachment( 0, 0 );
-      fdlUseContainerAuth.top = new FormAttachment( wName, margin );
-      fdlUseContainerAuth.right = new FormAttachment( middle, -margin );
-      wlUseContainerAuth.setLayoutData( fdlUseContainerAuth );
-      wUseContainerAuth = new Button( shell, SWT.CHECK );
-      props.setLook( wUseContainerAuth );
-      wUseContainerAuth.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.UseContainerAuth.Tooltip" ) );
-      fdUseContainerAuth = new FormData();
-      fdUseContainerAuth.left = new FormAttachment( middle, 0 );
-      fdUseContainerAuth.top = new FormAttachment( wName, margin );
-      fdUseContainerAuth.right = new FormAttachment( 100, 0 );
-      wUseContainerAuth.setLayoutData( fdUseContainerAuth );
+    // use container auth checkbox
+    wlUseContainerAuth = new Label( shell, SWT.RIGHT );
+    wlUseContainerAuth.setText( BaseMessages.getString( PKG, "BigQueryStream.UseContainerAuth.Label" ) );
+    props.setLook( wlUseContainerAuth );
+    fdlUseContainerAuth = new FormData();
+    fdlUseContainerAuth.left = new FormAttachment( 0, 0 );
+    fdlUseContainerAuth.top = new FormAttachment( wName, margin );
+    fdlUseContainerAuth.right = new FormAttachment( middle, -margin );
+    wlUseContainerAuth.setLayoutData( fdlUseContainerAuth );
+    wUseContainerAuth = new Button( shell, SWT.CHECK );
+    props.setLook( wUseContainerAuth );
+    wUseContainerAuth.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.UseContainerAuth.Tooltip" ) );
+    fdUseContainerAuth = new FormData();
+    fdUseContainerAuth.left = new FormAttachment( middle, 0 );
+    fdUseContainerAuth.top = new FormAttachment( wName, margin );
+    fdUseContainerAuth.right = new FormAttachment( 100, 0 );
+    wUseContainerAuth.setLayoutData( fdUseContainerAuth );
 
-      // Credentials path
-      cplName = new Label( shell, SWT.RIGHT );
-      cplName.setText( BaseMessages.getString( PKG, "BigQueryStream.CredentialsPath.Label" ) );
-      props.setLook( cplName );
-      fcplName = new FormData();
-      fcplName.left = new FormAttachment( 0, 0 );
-      fcplName.right = new FormAttachment( middle, -margin );
-      fcplName.top = new FormAttachment( wUseContainerAuth, margin );
-      cplName.setLayoutData( fcplName );
-      cpName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      cpName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.CredentialsPath.Tooltip"));
-      props.setLook( cpName );
-      cpName.addModifyListener( lsMod );
-      fcpName = new FormData();
-      fcpName.left = new FormAttachment( middle, 0 );
-      fcpName.top = new FormAttachment( wUseContainerAuth, margin );
-      fcpName.right = new FormAttachment( 100, 0 );
-      cpName.setLayoutData( fcpName );
+    // Credentials path
+    cplName = new Label( shell, SWT.RIGHT );
+    cplName.setText( BaseMessages.getString( PKG, "BigQueryStream.CredentialsPath.Label" ) );
+    props.setLook( cplName );
+    fcplName = new FormData();
+    fcplName.left = new FormAttachment( 0, 0 );
+    fcplName.right = new FormAttachment( middle, -margin );
+    fcplName.top = new FormAttachment( wUseContainerAuth, margin );
+    cplName.setLayoutData( fcplName );
+    cpName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    cpName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.CredentialsPath.Tooltip"));
+    props.setLook( cpName );
+    cpName.addModifyListener( lsMod );
+    fcpName = new FormData();
+    fcpName.left = new FormAttachment( middle, 0 );
+    fcpName.top = new FormAttachment( wUseContainerAuth, margin );
+    fcpName.right = new FormAttachment( 100, 0 );
+    cpName.setLayoutData( fcpName );
 
-      // BigQuery Project Id
-      plName = new Label( shell, SWT.RIGHT );
-      plName.setText( BaseMessages.getString( PKG, "BigQueryStream.Project.Label" ) );
-      props.setLook( plName );
-      fplName = new FormData();
-      fplName.left = new FormAttachment( 0, 0 );
-      fplName.right = new FormAttachment( middle, -margin );
-      fplName.top = new FormAttachment( cpName, margin );
-      plName.setLayoutData( fplName );
-      pName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      pName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Project.Tooltip"));
-      props.setLook( pName );
-      pName.addModifyListener( lsMod );
-      fpName = new FormData();
-      fpName.left = new FormAttachment( middle, 0 );
-      fpName.top = new FormAttachment( cpName, margin );
-      fpName.right = new FormAttachment( 100, 0 );
-      pName.setLayoutData( fpName );
+    // BigQuery Project Id
+    plName = new Label( shell, SWT.RIGHT );
+    plName.setText( BaseMessages.getString( PKG, "BigQueryStream.Project.Label" ) );
+    props.setLook( plName );
+    fplName = new FormData();
+    fplName.left = new FormAttachment( 0, 0 );
+    fplName.right = new FormAttachment( middle, -margin );
+    fplName.top = new FormAttachment( cpName, margin );
+    plName.setLayoutData( fplName );
+    pName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    pName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Project.Tooltip"));
+    props.setLook( pName );
+    pName.addModifyListener( lsMod );
+    fpName = new FormData();
+    fpName.left = new FormAttachment( middle, 0 );
+    fpName.top = new FormAttachment( cpName, margin );
+    fpName.right = new FormAttachment( 100, 0 );
+    pName.setLayoutData( fpName );
 
-      // BigQuery dataset name
-      dslName = new Label( shell, SWT.RIGHT );
-      dslName.setText( BaseMessages.getString( PKG, "BigQueryStream.DataSet.Label" ) );
-      props.setLook( dslName );
-      fdslName = new FormData();
-      fdslName.left = new FormAttachment( 0, 0 );
-      fdslName.right = new FormAttachment( middle, -margin );
-      fdslName.top = new FormAttachment( pName, margin );
-      dslName.setLayoutData( fdslName );
-      dsName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      dsName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.DataSet.Tooltip"));
-      props.setLook( dsName );
-      dsName.addModifyListener( lsMod );
-      fdsName = new FormData();
-      fdsName.left = new FormAttachment( middle, 0 );
-      fdsName.top = new FormAttachment( pName, margin );
-      fdsName.right = new FormAttachment( 100, 0 );
-      dsName.setLayoutData( fdsName );
+    // BigQuery dataset name
+    dslName = new Label( shell, SWT.RIGHT );
+    dslName.setText( BaseMessages.getString( PKG, "BigQueryStream.DataSet.Label" ) );
+    props.setLook( dslName );
+    fdslName = new FormData();
+    fdslName.left = new FormAttachment( 0, 0 );
+    fdslName.right = new FormAttachment( middle, -margin );
+    fdslName.top = new FormAttachment( pName, margin );
+    dslName.setLayoutData( fdslName );
+    dsName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    dsName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.DataSet.Tooltip"));
+    props.setLook( dsName );
+    dsName.addModifyListener( lsMod );
+    fdsName = new FormData();
+    fdsName.left = new FormAttachment( middle, 0 );
+    fdsName.top = new FormAttachment( pName, margin );
+    fdsName.right = new FormAttachment( 100, 0 );
+    dsName.setLayoutData( fdsName );
 
-      // create dataset checkbox
-      wlCreateDataset = new Label( shell, SWT.RIGHT );
-      wlCreateDataset.setText( BaseMessages.getString( PKG, "BigQueryStream.CreateDataset.Label" ) );
-      props.setLook( wlCreateDataset );
-      fdlCreateDataset = new FormData();
-      fdlCreateDataset.left = new FormAttachment( 0, 0 );
-      fdlCreateDataset.top = new FormAttachment( dsName, margin );
-      fdlCreateDataset.right = new FormAttachment( middle, -margin );
-      wlCreateDataset.setLayoutData( fdlCreateDataset );
-      wCreateDataset = new Button( shell, SWT.CHECK );
-      props.setLook( wCreateDataset );
-      wCreateDataset.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.CreateDataset.Tooltip" ) );
-      fdCreateDataset = new FormData();
-      fdCreateDataset.left = new FormAttachment( middle, 0 );
-      fdCreateDataset.top = new FormAttachment( dsName, margin );
-      fdCreateDataset.right = new FormAttachment( 100, 0 );
-      wCreateDataset.setLayoutData( fdCreateDataset );
+    // create dataset checkbox
+    wlCreateDataset = new Label( shell, SWT.RIGHT );
+    wlCreateDataset.setText( BaseMessages.getString( PKG, "BigQueryStream.CreateDataset.Label" ) );
+    props.setLook( wlCreateDataset );
+    fdlCreateDataset = new FormData();
+    fdlCreateDataset.left = new FormAttachment( 0, 0 );
+    fdlCreateDataset.top = new FormAttachment( dsName, margin );
+    fdlCreateDataset.right = new FormAttachment( middle, -margin );
+    wlCreateDataset.setLayoutData( fdlCreateDataset );
+    wCreateDataset = new Button( shell, SWT.CHECK );
+    props.setLook( wCreateDataset );
+    wCreateDataset.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.CreateDataset.Tooltip" ) );
+    fdCreateDataset = new FormData();
+    fdCreateDataset.left = new FormAttachment( middle, 0 );
+    fdCreateDataset.top = new FormAttachment( dsName, margin );
+    fdCreateDataset.right = new FormAttachment( 100, 0 );
+    wCreateDataset.setLayoutData( fdCreateDataset );
 
-      // table name
-      tlName = new Label( shell, SWT.RIGHT );
-      tlName.setText( BaseMessages.getString( PKG, "BigQueryStream.Table.Label" ) );
-      props.setLook( tlName );
-      ftlName = new FormData();
-      ftlName.left = new FormAttachment( 0, 0 );
-      ftlName.right = new FormAttachment( middle, -margin );
-      ftlName.top = new FormAttachment( wlCreateDataset, margin );
-      tlName.setLayoutData( ftlName );
-      tName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-      tName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Table.Tooltip"));
-      props.setLook( tName );
-      tName.addModifyListener( lsMod );
-      ftName = new FormData();
-      ftName.left = new FormAttachment( middle, 0 );
-      ftName.top = new FormAttachment( wlCreateDataset, margin );
-      ftName.right = new FormAttachment( 100, 0 );
-      tName.setLayoutData( ftName );
+    // table name
+    tlName = new Label( shell, SWT.RIGHT );
+    tlName.setText( BaseMessages.getString( PKG, "BigQueryStream.Table.Label" ) );
+    props.setLook( tlName );
+    ftlName = new FormData();
+    ftlName.left = new FormAttachment( 0, 0 );
+    ftlName.right = new FormAttachment( middle, -margin );
+    ftlName.top = new FormAttachment( wlCreateDataset, margin );
+    tlName.setLayoutData( ftlName );
+    tName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    tName.setToolTipText(BaseMessages.getString(PKG, "BigQueryStream.Table.Tooltip"));
+    props.setLook( tName );
+    tName.addModifyListener( lsMod );
+    ftName = new FormData();
+    ftName.left = new FormAttachment( middle, 0 );
+    ftName.top = new FormAttachment( wlCreateDataset, margin );
+    ftName.right = new FormAttachment( 100, 0 );
+    tName.setLayoutData( ftName );
 
-
-      // create table checkbox
-      wlCreateTable = new Label( shell, SWT.RIGHT );
-      wlCreateTable.setText( BaseMessages.getString( PKG, "BigQueryStream.CreateTable.Label" ) );
-      props.setLook( wlCreateTable );
-      fdlCreateTable = new FormData();
-      fdlCreateTable.left = new FormAttachment( 0, 0 );
-      fdlCreateTable.top = new FormAttachment( tName, margin );
-      fdlCreateTable.right = new FormAttachment( middle, -margin );
-      wlCreateTable.setLayoutData( fdlCreateTable );
-      wCreateTable = new Button( shell, SWT.CHECK );
-      props.setLook( wCreateTable );
-      wCreateTable.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.CreateTable.Tooltip" ) );
-      fdCreateTable = new FormData();
-      fdCreateTable.left = new FormAttachment( middle, 0 );
-      fdCreateTable.top = new FormAttachment( tName, margin );
-      fdCreateTable.right = new FormAttachment( 100, 0 );
-      wCreateTable.setLayoutData( fdCreateTable );
-
-
-      
+    // create table checkbox
+    wlCreateTable = new Label( shell, SWT.RIGHT );
+    wlCreateTable.setText( BaseMessages.getString( PKG, "BigQueryStream.CreateTable.Label" ) );
+    props.setLook( wlCreateTable );
+    fdlCreateTable = new FormData();
+    fdlCreateTable.left = new FormAttachment( 0, 0 );
+    fdlCreateTable.top = new FormAttachment( tName, margin );
+    fdlCreateTable.right = new FormAttachment( middle, -margin );
+    wlCreateTable.setLayoutData( fdlCreateTable );
+    wCreateTable = new Button( shell, SWT.CHECK );
+    props.setLook( wCreateTable );
+    wCreateTable.setToolTipText( BaseMessages.getString( PKG, "BigQueryStream.CreateTable.Tooltip" ) );
+    fdCreateTable = new FormData();
+    fdCreateTable.left = new FormAttachment( middle, 0 );
+    fdCreateTable.top = new FormAttachment( tName, margin );
+    fdCreateTable.right = new FormAttachment( 100, 0 );
+    wCreateTable.setLayoutData( fdCreateTable );
+  
     wOK = new Button( shell, SWT.PUSH );
     wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
     wCancel = new Button( shell, SWT.PUSH );
@@ -348,19 +362,24 @@ public class BigQueryStreamDialog extends BaseStepDialog implements StepDialogIn
     wName.setFocus();
   }
 
-  
+  /**
+   * Handles clicking cancel
+   */
   private void cancel() {
     stepname = null;
     input.setChanged( changed );
     dispose();
   }
 
+  /**
+   * Saves data to the meta class instance
+   */
   private void ok() {
     if ( null == wName.getText() || "".equals(wName.getText().trim()) ) {
-        MessageBox mb = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
-        mb.setText( BaseMessages.getString( PKG, "System.StepJobEntryNameMissing.Title" ) );
-        mb.setMessage( BaseMessages.getString( PKG, "System.JobEntryNameMissing.Msg" ) );
-        mb.open();
+      MessageBox mb = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
+      mb.setText( BaseMessages.getString( PKG, "System.StepJobEntryNameMissing.Title" ) );
+      mb.setMessage( BaseMessages.getString( PKG, "System.JobEntryNameMissing.Msg" ) );
+      mb.open();
       return;
     }
     stepname = wName.getText();

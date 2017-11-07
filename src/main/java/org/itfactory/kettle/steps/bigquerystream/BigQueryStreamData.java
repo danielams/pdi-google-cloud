@@ -2,7 +2,7 @@
  *
  * Pentaho Data Integration
  *
- * Copyright (C) 2002-2013 by Pentaho : http://www.pentaho.com
+ * Copyright (C) 2002-2017 by Pentaho : http://www.pentaho.com
  *
  *******************************************************************************
  *
@@ -26,32 +26,37 @@ import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
 
-import com.google.cloud.bigquery.*;
+import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.TableId;
+import com.google.cloud.bigquery.InsertAllRequest;
 
 /**
+ * Runtime transient data container for the PDI BigQuery stream step
+ * 
  * @author afowler
- * @since 06-nov-2017
- *
+ * @since 06-11-2017
  */
 public class BigQueryStreamData extends BaseStepData implements StepDataInterface {
- 
-	public RowMetaInterface outputRowMeta;
-	public RowMetaInterface inputRowMeta;
-    
-    // TODO use the below to handle specified fields only (not all stream fields)
-    public int[] fieldnrs;
-    public int nrfields;
-    public Object[] values;
-    public Object[] fieldNames;
+  public RowMetaInterface outputRowMeta;
+  public RowMetaInterface inputRowMeta;
 
-    // bigquery stream state variables
-    public BigQuery bigquery;
-    public TableId tableId;
-    public InsertAllRequest.Builder insertBuilder;
-    public int batchCounter = 0;
+  // TODO use the below to handle specified fields only (not all stream fields)
+  public int[] fieldnrs;
+  public int nrfields;
+  public Object[] values;
+  public Object[] fieldNames;
 
-    public BigQueryStreamData() {
-        super();
-    }
+  // bigquery stream state variables
+  public BigQuery bigquery;
+  public TableId tableId;
+  public InsertAllRequest.Builder insertBuilder;
+  public int batchCounter = 0;
+
+  /**
+   * Default constructor
+   */
+  public BigQueryStreamData() {
+    super();
+  }
 
 }
