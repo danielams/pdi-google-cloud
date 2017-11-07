@@ -1,3 +1,25 @@
+/*! ******************************************************************************
+ *
+ * Pentaho Data Integration
+ *
+ * Copyright (C) 2002-2017 by Pentaho : http://www.pentaho.com
+ *
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
+
 package org.itfactory.kettle.job.entries.bigqueryloader;
 
 import com.google.cloud.bigquery.LegacySQLTypeName;
@@ -40,7 +62,13 @@ import org.pentaho.di.ui.job.dialog.JobDialog;
 import org.pentaho.di.ui.job.entry.JobEntryDialog;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 
-
+/**
+ * PDI Dialog UI for the BigQuery bulk loading Job Entry
+ * 
+ * @author afowler
+ * @author asimoes
+ * @since 02-11-2017
+ */
 public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobEntryDialogInterface {
   private static Class<?> PKG = JobEntryBigQueryLoader.class;
 
@@ -116,6 +144,9 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
 
   private boolean changed = false;
 
+  /**
+   * Standard Constructor
+   */
   public JobEntryBigQueryLoaderDialog( Shell parent, JobEntryInterface jobEntryInt, Repository rep, JobMeta jobMeta ) {
     super( parent, jobEntryInt, rep, jobMeta );
     this.jobEntry = (JobEntryBigQueryLoader) jobEntryInt;
@@ -124,6 +155,9 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     }
   }
 
+  /**
+   * Creates the UI and displays it
+   */
   public JobEntryInterface open() {
     Shell parent = getParent();
     Display display = parent.getDisplay();
@@ -521,6 +555,9 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     return jobEntry;
   }
 
+  /**
+   * Gets the data for the UI from the job entry configuration
+   */
   public void getData() {
     wName.setText( Const.nullToEmpty( jobEntry.getName() ) );
     wUseContainerAuth.setSelection( jobEntry.getUseContainerSecurity() );
@@ -554,6 +591,9 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     }
   }
 
+  /**
+   * Saves the UI configuration to the job entry instance
+   */
   private void ok() {
     if ( null == wName.getText() || wName.getText().length() == 0 ) {
       MessageBox mb = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
@@ -590,12 +630,18 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
     dispose();
   }
 
+  /**
+   * Handles a cancel click on the UI
+   */
   private void cancel() {
     jobEntry.setChanged( changed );
     jobEntry = null;
     dispose();
   }
 
+  /**
+   * Destroys this UI element
+   */
   public void dispose() {
     //closeFTPConnections();
     WindowProperty winprop = new WindowProperty( shell );

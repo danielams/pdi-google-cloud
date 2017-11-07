@@ -1,3 +1,25 @@
+/*! ******************************************************************************
+ *
+ * Pentaho Data Integration
+ *
+ * Copyright (C) 2002-2017 by Pentaho : http://www.pentaho.com
+ *
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
+
 package org.itfactory.kettle.job.entries.bigqueryloader;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -49,6 +71,13 @@ import java.util.Map;
   casesUrl = "GoogleBigQueryStorageLoad.CasesURL",
   forumUrl = "GoogleBigQueryStorageLoad.ForumURL"
 )
+/**
+ * Custom Job Entry that enables a bulk upload from a file on Google Cloud Storage to a table in Google BigQuery.
+ * 
+ * @author afowler
+ * @author asimoes
+ * @since 02-11-2017
+ */
 public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, JobEntryInterface {
 
   private static Class<?> PKG = JobEntryBigQueryLoader.class;
@@ -77,24 +106,36 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
 
   BigQuery bigquery;
 
+  /**
+   * Default constructor
+   */
   public JobEntryBigQueryLoader() {
     super( "BigQueryLoader", "Loads Google Cloud Storage files in to Google BigQuery" );
 
     tableFields = new HashMap<String, String>();
   }
 
+  /**
+   * Constructor including the name of the Job Entry
+   */
   public JobEntryBigQueryLoader( String name ) {
     super( name, "Loads Google Cloud Storage files in to Google BigQuery" );
 
     tableFields = new HashMap<String, String>();
   }
 
+  /**
+   * Clones this Job Entry configuration
+   */
   public Object clone() {
     JobEntryBigQueryLoader je = (JobEntryBigQueryLoader) super.clone();
     return je;
   }
 
   @Override
+  /**
+   * Returns the class name of this custom Job Entry's Dialog box
+   */
   public String getDialogClassName() {
     return JobEntryBigQueryLoaderDialog.class.getName();
   }
@@ -103,6 +144,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
     return true;
   }
 
+  /**
+   * Returns this Job Entry instances configuration as XML to be saved to a kjb file
+   */
   public String getXML() {
     StringBuilder retval = new StringBuilder( 650 ); // 528 chars in spaces and tags alone
 
@@ -133,6 +177,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
     return retval.toString();
   }
 
+  /**
+   * Loads the configuration in to this object for this job entry from a kjb file
+   */
   public void loadXML( Node entrynode, List<DatabaseMeta> databases, List<SlaveServer> slaveServers,
                        Repository rep, IMetaStore metaStore ) throws KettleXMLException {
     try {
@@ -205,6 +252,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
     }
   }
 
+  /**
+   * Loads configuration for this job entry from a repository file
+   */
   public void loadRep( Repository rep, IMetaStore metaStore, ObjectId id_jobentry, List<DatabaseMeta> databases,
                        List<SlaveServer> slaveServers ) throws KettleException {
     try {
@@ -237,6 +287,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
     }
   }
 
+  /**
+   * Saves this job entry instance's configuration to a repository
+   */
   public void saveRep( Repository rep, IMetaStore metaStore, ObjectId id_job ) throws KettleException {
 
     try {
@@ -264,6 +317,9 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
     }
   }
 
+  /**
+   * Executes this job entry instance (Imports the file(s) to BigQuery)
+   */
   public Result execute( Result previousResult, int nr ) throws KettleException {
 
     Result result = previousResult;
@@ -363,127 +419,234 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
     return result;
   }
 
+  /**
+   * Sets the Google BigQuery dataset name
+   */
   public void setDatasetName( String dsn ) {
     datasetName = dsn;
   }
 
+  /**
+   * Returns the Google BigQuery dataset name
+   */
   public String getDatasetName() {
     return datasetName;
   }
 
+  /**
+   * Sets the Google BigQuery table name
+   */
   public void setTableName( String tn ) {
     tableName = tn;
   }
 
+  /**
+   * Returns the Google BigQuery table name
+   */
   public String getTableName() {
     return tableName;
   }
 
+  /**
+   * Sets the Google Cloud Storage source URL pattern (may include wildcards)
+   */
   public void setSourceUri( String uri ) {
     sourceUri = uri;
   }
 
+  /**
+   * Returns the Google Cloud Storage source URL pattern (may include wildcards)
+   */
   public String getSourceUri() {
     return sourceUri;
   }
 
+  /**
+   * Sets whether to create the dataset if it does not exist in BigQuery
+   */
   public void setCreateDataset( boolean doit ) {
     createDataset = doit;
   }
 
+  /**
+   * Returns whether this job will attempt to create the dataset in BigQuery if it does not exist
+   */
   public boolean getCreateDataset() {
     return createDataset;
   }
 
+  /**
+   * Sets whether to create the table if it does not exist in this BigQuery dataset
+   */
   public boolean getCreateTable() {
     return createTable;
   }
 
+  /**
+   * Returns whether this job will attempt to create the table in the BigQuery dataset if it does not exist
+   */
   public void setCreateTable( boolean doit ) {
     createTable = doit;
   }
 
+  /**
+   * Returns the file type (JSON,CSV,Avro)
+   */
   public String getFileType() {
     return fileType;
   }
 
+  /**
+   * Sets the file type (JSON,CSV,Avro)
+   */
   public void setFileType( String ft ) {
     fileType = ft;
   }
 
+  /**
+   * Sets the delimiter character/string (CSV files only)
+   */
   public void setDelimiter( String delim ) {
     delimiter = delim;
   }
 
+  /**
+   * Returns the CSV delimiter character/string
+   */
   public String getDelimiter() {
     return delimiter;
   }
 
+  /**
+   * Sets the quote character/string (CSV files only)
+   */
   public void setQuote( String q ) {
     quote = q;
   }
 
+  /**
+   * Returns the CSV quote character/string
+   */
   public String getQuote() {
     return quote;
   }
 
+  /**
+   * Sets the number of rows to skip in the CSV file. Actually an Integer.
+   * 
+   * E.g. if the CSV has a header row, this would be 1. If no header row is present, this would be 0.
+   */
   public void setLeadingRowsToSkip( String skip ) {
     leadingRowsToSkip = skip;
   }
 
+  /**
+   * Returns the number of leading rows to skip. Actually an Integer.
+   */
   public String getLeadingRowsToSkip() {
     return leadingRowsToSkip;
   }
 
+  /**
+   * Sets whether to use container security (true) or a specified google cloud JSON authentication file (false)
+   */
   public void setUseContainerSecurity( boolean use ) {
     useContainerSecurity = use;
   }
 
+  /**
+   * Returns whether to use container security (true) or a specified google cloud JSON authentication file (false)
+   */
   public boolean getUseContainerSecurity() {
     return useContainerSecurity;
   }
 
+  /**
+   * Sets the Google Cloud project ID for the dataset/table
+   * 
+   * Note: Not used in google container security (set by the container instead)
+   */
   public void setProjectId( String pid ) {
     projectId = pid;
   }
 
+  /**
+   * Returns the Google Cloud project ID for the dataset/table
+   * 
+   * Note: Not used in google container security (set by the container instead)
+   */
   public String getProjectId() {
     return projectId;
   }
 
+  /**
+   * Sets the Google Cloud JSON credentials file path
+   * 
+   * Note: Doesn't apply if using container security
+   */
   public void setCredentialsPath( String cp ) {
     credentialsPath = cp;
   }
 
+  /**
+   * Returns the Google Cloud JSON credentials file path
+   * 
+   * Note: Doesn't apply if using container security
+   */
   public String getCredentialsPath() {
     return credentialsPath;
   }
 
+  /**
+   * Sets the fields configured in the BigQuery table
+   * 
+   * Note: Only used when creating a new table in BigQuery
+   */
   public void setTableFields( Map<String, String> fs ) {
     tableFields = fs;
   }
 
+  /**
+   * Returns the fields configured in the BigQuery table
+   * 
+   * Note: Only used when creating a new table in BigQuery
+   */
   public Map<String, String> getTableFields() {
     return tableFields;
   }
 
+  /**
+   * Internal working method that creates a number of fields for the BigQuery table
+   */
   public void allocate( int nrfields ) {
     fieldNames = new String[ nrfields ];
     fieldTypes = new String[ nrfields ];
   }
 
+  /**
+   * Internal worker method that returns the array of field names for fields in the BigQuery table
+   */
   public String[] getFieldNames() {
     return fieldNames;
   }
 
+  /**
+   * Internal worker method that sets the array of field names for fields in the BigQuery table
+   */
   public void setFieldNames( String[] fn ) {
     fieldNames = fn;
   }
 
+  /**
+   * Internal worker method that returns the array of field types for fields in the BigQuery table
+   */
   public String[] getFieldTypes() {
     return fieldTypes;
   }
 
+  /**
+   * Internal worker method that sets the array of field types for fields in the BigQuery table
+   */
   public void setFieldTypes( String[] t ) {
     fieldTypes = t;
   }
