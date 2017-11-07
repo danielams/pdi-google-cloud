@@ -222,7 +222,7 @@ public class BigQueryStream extends BaseStep implements StepInterface {
     //putRow( data.outputRowMeta, outputRow ); 
     
     putRow( data.outputRowMeta, r );  
-    
+     
 
     if ( checkFeedback( getLinesRead() ) ) {
       if ( log.isBasic() ) {
