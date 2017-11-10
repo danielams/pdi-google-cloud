@@ -53,7 +53,7 @@ import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
 @Step( id = "BigQueryStreamOutput",
-image = "BigQueryStreamOutput.svg",
+image = "google_query.svg",
  i18nPackageName = "org.itfactory.kettle.steps.bigquerystream", name = "BigQueryStream.Name",
  description = "BigQueryStream.Description",
  categoryDescription = "i18n:org.pentaho.di.steps:StepCategory.Category.BigData" )

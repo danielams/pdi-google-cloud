@@ -64,7 +64,7 @@ import java.util.Map;
   id = "GoogleBigQueryStorageLoad",
   name = "GoogleBigQueryStorageLoad.Name",
   description = "GoogleBigQueryStorageLoad.TooltipDesc",
-  image = "org/itfactory/kettle/job/entries/bigqueryloader/bigqueryloader.svg",
+  image = "google_bulk_loader.svg",
   categoryDescription = "i18n:org.pentaho.di.job:JobCategory.Category.BigData",
   i18nPackageName = "org.itfactory.kettle.job.entries.bigqueryloader",
   documentationUrl = "GoogleBigQueryStorageLoad.DocumentationURL",
