@@ -471,10 +471,18 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
       new TableView(
         jobEntry, shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, colinf, FieldsRows, lsMod, props );
 
+    wOK = new Button( shell, SWT.PUSH );
+    wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
+    wCancel = new Button( shell, SWT.PUSH );
+    wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
+
+    BaseStepDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel }, margin, null );
+
     fdFields = new FormData();
     fdFields.left = new FormAttachment( 0, 0 );
     fdFields.top = new FormAttachment( wlFields, margin );
     fdFields.right = new FormAttachment( 100, 0 );
+    fdFields.bottom = new FormAttachment( wOK, -2 * margin );
     //fdFields.bottom = new FormAttachment( wOK, -2 * margin );
     wFields.setLayoutData( fdFields );
 
@@ -493,13 +501,6 @@ public class JobEntryBigQueryLoaderDialog extends JobEntryDialog implements JobE
         generalLayout.marginHeight = 3;
         wGeneralComp.setLayout( generalLayout );
 */
-
-    wOK = new Button( shell, SWT.PUSH );
-    wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
-    wCancel = new Button( shell, SWT.PUSH );
-    wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
-
-    BaseStepDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel }, margin, wFields );
 
     // Add listeners
     lsCancel = new Listener() {
