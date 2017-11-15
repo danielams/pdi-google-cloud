@@ -96,7 +96,7 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
   private boolean createTable = false;
   private String fileType = TYPE_CSV;
   private String delimiter = ",";
-  private String quote = "\"";
+  private String quote = "";
   private String leadingRowsToSkip = "1";
 
   private Map<String, String> tableFields;
@@ -205,7 +205,7 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
 
       String q = XMLHandler.getTagValue( entrynode, "quote" );
       if ( null == q ) { // no empty check as sometimes you don't want a quote field (quotes not in csv file)
-        quote = "\"";
+        quote = "";
       } else {
         quote = q;
       }
@@ -401,7 +401,7 @@ public class JobEntryBigQueryLoader extends JobEntryBase implements Cloneable, J
         if ( loadJob.getStatus().getError() != null ) {
           result.setNrErrors( 1 );
           result.setResult( false );
-          logError( "Error while loading table: " + loadJob.getStatus().getError().toString() );
+          logError( "Error while loading table: " + loadJob.getStatus().toString() );
         } else {
           result.setResult( true );
         }
