@@ -1,6 +1,0 @@
-<application>
-  <component name="Git.Application.Settings">
-    <option name="myPathToGit" value="C:\Users\waele\AppData\Local\GitHubDesktop\app-1.0.9\resources\app\git\mingw64\bin\git.exe" />
-    <option name="SSH_EXECUTABLE" value="IDEA_SSH" />
-  </component>
-</application>
