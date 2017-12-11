@@ -1,3 +1,24 @@
+/*! ******************************************************************************
+ *
+ * Pentaho Data Integration
+ *
+ * Copyright (C) 2002-2017 by Pentaho : http://www.pentaho.com
+ *
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
 
 package org.itfactory.kettle.steps.bigquerystream;
 
@@ -28,31 +49,43 @@ import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
 import org.pentaho.metastore.api.IMetaStore;
+
 import org.w3c.dom.Node;
 
 @Step( id = "BigQueryStreamOutput",
-image = "BigQueryStreamOutput.svg",
+image = "google_query.svg",
  i18nPackageName = "org.itfactory.kettle.steps.bigquerystream", name = "BigQueryStream.Name",
  description = "BigQueryStream.Description",
  categoryDescription = "i18n:org.pentaho.di.steps:StepCategory.Category.BigData" )
- 
+/**
+ * Metadata (configuration) holding class for the BigQuery stream loading custom step
+ * 
+ * @author afowler
+ * @since 06-11-2017
+ */
 public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterface {
-    private static Class<?> PKG = BigQueryStreamMeta.class; // for i18n purposes, needed by Translator2!!
+  private static Class<?> PKG = BigQueryStreamMeta.class; // for i18n purposes, needed by Translator2!!
 
-    private boolean useContainerSecurity = false;
-    private String credentialsPath = "C:/Users/afowler/Documents/Apps/google-cloud/BigQueryTesting-fd7a2959ea0f.json";
-    private String projectId = "bigquery-testing-184814";
-    private String datasetName = "salesdata";
-    private String tableName = "ages";
-    private boolean createDataset = true;
-    private boolean createTable = true;
+  private boolean useContainerSecurity = false;
+  private String credentialsPath = "C:/Users/afowler/Documents/Apps/google-cloud/BigQueryTesting-fd7a2959ea0f.json";
+  private String projectId = "bigquery-testing-184814";
+  private String datasetName = "salesdata";
+  private String tableName = "ages";
+  private boolean createDataset = true;
+  private boolean createTable = true;
 
-    @Override
-    public void loadXML( Node stepnode, List<DatabaseMeta> databases, IMetaStore metaStore ) throws KettleXMLException {
-      readData( stepnode );
-    }
+  @Override
+  /**
+   * Loads step configuration from PDI ktr file XML
+   */
+  public void loadXML( Node stepnode, List<DatabaseMeta> databases, IMetaStore metaStore ) throws KettleXMLException {
+    readData( stepnode );
+  }
     
   @Override
+  /**
+   * Clones this meta class instance in PDI
+   */
   public Object clone() {
     BigQueryStreamMeta retval = (BigQueryStreamMeta) super.clone();
 /*
@@ -70,11 +103,17 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
   }
   
   @Override
+  /**
+   * Adds any additional fields to the stream
+   */
   public void getFields( RowMetaInterface r, String origin, RowMetaInterface[] info, StepMeta nextStep, VariableSpace space ) {
     // we don't add any, so leave blank
   }
 
 
+  /**
+   * Actually read the XML stream (used by loadXML())
+   */
   private void readData( Node entrynode ) throws KettleXMLException {
     try {
         /*
@@ -126,6 +165,9 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
   }
 
   @Override
+  /**
+   * Sets default metadata configuration
+   */
   public void setDefault() {
     int i, nrfields;
 
@@ -142,6 +184,9 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
   }
 
   @Override
+  /**
+   * Returns the XML configuration of this step for saving in a ktr file
+   */
   public String getXML() {
     StringBuffer retval = new StringBuffer( 300 );
     retval.append( "      " ).append( XMLHandler.addTagValue( "useContainerSecurity", useContainerSecurity?"Y":"N" ) );
@@ -167,6 +212,9 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
   }
 
   @Override
+  /**
+   * Reads the configuration of this step from a repository
+   */
   public void readRep( Repository rep, IMetaStore metaStore, ObjectId id_step, List<DatabaseMeta> databases ) throws KettleException {
 
     try {
@@ -195,6 +243,9 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
   }
 
   @Override
+  /**
+   * Saves the configuration of this step to a repository
+   */
   public void saveRep( Repository rep, IMetaStore metaStore, ObjectId id_transformation, ObjectId id_step ) throws KettleException {
     try {
         /*
@@ -217,12 +268,15 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
   }
 
   @Override
+  /**
+   * Validates this step's configuration
+   */
   public void check( List<CheckResultInterface> remarks, TransMeta transMeta, StepMeta stepMeta,
     RowMetaInterface prev, String[] input, String[] output, RowMetaInterface info, VariableSpace space,
     Repository repository, IMetaStore metaStore ) {
 
     CheckResult cr;
-    String message = "";
+    //String message = "";
 /*
     if ( fieldName.length > 0 ) {
       boolean error_found = false;
@@ -289,70 +343,124 @@ public class BigQueryStreamMeta extends BaseStepMeta implements StepMetaInterfac
   }
 
   @Override
+  /**
+   * Returns a new instance of this step
+   */
   public StepInterface getStep( StepMeta stepMeta, StepDataInterface stepDataInterface, int cnr,
     TransMeta transMeta, Trans trans ) {
     return new BigQueryStream( stepMeta, stepDataInterface, cnr, transMeta, trans );
   }
 
   @Override
+  /**
+   * Returns a new instance of step data
+   */
   public StepDataInterface getStepData() {
     return new BigQueryStreamData();
   }
   
+  /**
+   * Sets the dataset name for google bigquery
+   */
   public void setDatasetName(String dsn) {
     datasetName = dsn;
-}
+  }
 
-public String getDatasetName() {
+  /**
+   * Returns the google bigquery dataset name
+   */
+  public String getDatasetName() {
     return datasetName;
-}
+  } 
 
-public void setTableName(String tn) {
+  /**
+   * Sets the google bigquery table name
+   */
+  public void setTableName(String tn) {
     tableName = tn;
-}
+  }
 
-public String getTableName() {
+  /**
+   * Returns the google bigquery table name
+   */
+  public String getTableName() {
     return tableName;
-}
+  }
 
-public void setCreateDataset(boolean doit) {
+  /**
+   * Sets the google bigquery dataset name
+   */
+  public void setCreateDataset(boolean doit) {
     createDataset = doit;
-}
+  }
 
-public boolean getCreateDataset() {
+  /**
+   * Returns the google bigquery dataset name
+   */
+  public boolean getCreateDataset() {
     return createDataset;
-}
+  }
 
-public boolean getCreateTable() {
+  /**
+   * Returns whether the step will attempt to create the bigquery table if it does not already exist
+   */
+  public boolean getCreateTable() {
     return createTable;
-}
+  }
 
-public void setCreateTable(boolean doit) {
+  /**
+   * Sets whether the step will attempt to create the bigquery table if it does not already exist
+   */
+  public void setCreateTable(boolean doit) {
     createTable = doit;
-}
+  }
 
-public void setUseContainerSecurity(boolean use) {
+  /**
+   * Sets whether to use container security (true) or google cloud credentials json files (false)
+   */
+  public void setUseContainerSecurity(boolean use) {
     useContainerSecurity = use;
-}
+  }
 
-public boolean getUseContainerSecurity() {
+  /**
+   * Returns whether to use container security (true) or google cloud credentials json files (false)
+   */
+  public boolean getUseContainerSecurity() {
     return useContainerSecurity;
-}
+  }
 
-public void setProjectId(String pid) {
+  /**
+   * Sets the google bigquery project id
+   * 
+   * Note: Not used if using container security (set by the container)
+   */
+  public void setProjectId(String pid) {
     projectId = pid;
-}
+  }
 
-public String getProjectId() {
+  /**
+   * Returns the google bigquery project id
+   */
+  public String getProjectId() {
     return projectId;
-}
+  }
 
-public void setCredentialsPath(String cp) {
+  /**
+   * Sets the google cloud credentials json file path
+   * 
+   * Note: Only used if useContainerSecurity is false
+   */
+  public void setCredentialsPath(String cp) {
     credentialsPath = cp;
-}
+  }
 
-public String getCredentialsPath() {
+  /**
+   * Returns the google cloud credentials json file path
+   * 
+   * Note: Only used if useContainerSecurity is false
+   */
+  public String getCredentialsPath() {
     return credentialsPath;
-}
+  }
 
 }

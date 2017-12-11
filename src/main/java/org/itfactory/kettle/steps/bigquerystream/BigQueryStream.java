@@ -1,12 +1,29 @@
+/*! ******************************************************************************
+ *
+ * Pentaho Data Integration
+ *
+ * Copyright (C) 2002-2017 by Pentaho : http://www.pentaho.com
+ *
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
 
 package org.itfactory.kettle.steps.bigquerystream;
 
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.exception.KettleValueException;
-import org.pentaho.di.core.row.RowDataUtil;
-import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMetaInterface;
-import org.pentaho.di.core.row.ValueMetaAndData;
 import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
@@ -15,32 +32,36 @@ import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaInterface;
-import org.pentaho.di.core.row.RowMeta;
-import org.pentaho.di.core.row.ValueMeta;
 
-import com.google.cloud.bigquery.*;
+import com.google.cloud.bigquery.BigQueryOptions;
+import com.google.cloud.bigquery.Table;
+import com.google.cloud.bigquery.TableId;
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.DatasetInfo;
+import com.google.cloud.bigquery.Dataset;
+import com.google.cloud.bigquery.InsertAllRequest;
+import com.google.cloud.bigquery.TableInfo;
+import com.google.cloud.bigquery.BigQueryError;
+import com.google.cloud.bigquery.LegacySQLTypeName;
+import com.google.cloud.bigquery.Schema;
+import com.google.cloud.bigquery.StandardTableDefinition;
+import com.google.cloud.bigquery.InsertAllResponse;
 import com.google.auth.oauth2.GoogleCredentials;
 
-import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.Iterator;
-import java.util.Set;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
- * BigQuery Stream Output Step
+ * BigQuery Stream loading Output Step
  *
  * @author afowler
- * @since 06-nov-2017
+ * @since 06-11-2017
  */
 public class BigQueryStream extends BaseStep implements StepInterface {
   private static Class<?> PKG = BigQueryStreamMeta.class; // for i18n purposes, needed by Translator2!!
@@ -48,22 +69,27 @@ public class BigQueryStream extends BaseStep implements StepInterface {
   private BigQueryStreamMeta meta;
   private BigQueryStreamData data;
 
+  /**
+   * Standard constructor
+   */
   public BigQueryStream( StepMeta stepMeta, StepDataInterface stepDataInterface, int copyNr, TransMeta transMeta,
     Trans trans ) {
     super( stepMeta, stepDataInterface, copyNr, transMeta, trans );
   }
 
+  /**
+   * Processes a single row in the PDI stream
+   */
   public boolean processRow( StepMetaInterface smi, StepDataInterface sdi ) throws KettleException {
     meta = (BigQueryStreamMeta) smi;
     data = (BigQueryStreamData) sdi;
 
     Object[] r = getRow(); // get row, set busy!
 
-
     if ( r == null ) {
       // no more input to be expected...
       // finish current stream
-      checkBatch(null);
+      checkBatch( null );
       // clean up connection and environment
       data.insertBuilder = null;
       data.tableId = null;
@@ -89,44 +115,43 @@ public class BigQueryStream extends BaseStep implements StepInterface {
       }*/
 
       // TODO Create connection
-      
+
       try {
 
-      BigQueryOptions options;
-      if (meta.getUseContainerSecurity()) {
+        BigQueryOptions options;
+        if ( meta.getUseContainerSecurity() ) {
+          options = BigQueryOptions.newBuilder()
+          .setProjectId( meta.getProjectId() )
+          .build();
+        } else {
+          options = BigQueryOptions.newBuilder()
+          .setProjectId( meta.getProjectId() )
+          .setCredentials( GoogleCredentials.fromStream(
+            new FileInputStream( meta.getCredentialsPath() ) )
+          ).build();
+        }
+        data.bigquery = options.getService();
 
-        options = BigQueryOptions.newBuilder()
-        .setProjectId(meta.getProjectId())
-        .build();
-      } else {
-      options = BigQueryOptions.newBuilder()
-      .setProjectId(meta.getProjectId())
-      .setCredentials(GoogleCredentials.fromStream(
-        new FileInputStream(meta.getCredentialsPath()))
-      ).build();
-      }
-      data.bigquery = options.getService();
+        DatasetInfo datasetInfo = Dataset.of( meta.getDatasetName() );
+        Dataset dataset = data.bigquery.getDataset( datasetInfo.getDatasetId() );
 
-      DatasetInfo datasetInfo = Dataset.of(meta.getDatasetName());
-      Dataset dataset = data.bigquery.getDataset(datasetInfo.getDatasetId());
-
-      if (dataset == null) {
-          if (meta.getCreateDataset()) {
-              System.out.println("Creating dataset");
-              dataset = data.bigquery.create(datasetInfo);
+        if ( dataset == null ) {
+          if ( meta.getCreateDataset() ) {
+            //System.out.println( "Creating dataset" );
+            dataset = data.bigquery.create( datasetInfo );
           } else {
-              System.out.println("Please create the dataset: " + meta.getDatasetName());
-              System.exit(1);
+            System.out.println( "Please create the dataset: " + meta.getDatasetName() );
+            //System.exit( 1 );
           }
-      }
+        }
 
-      data.tableId = TableId.of(dataset.getDatasetId().getDataset(), meta.getTableName());
-      Table table = data.bigquery.getTable(data.tableId);
+        data.tableId = TableId.of( dataset.getDatasetId().getDataset(), meta.getTableName() );
+        Table table = data.bigquery.getTable( data.tableId );
 
-      if (table == null) {
-          if (meta.getCreateTable()) {
-              System.out.println("Creating table");
-          List<Field> fieldList = new ArrayList<Field>();
+        if ( table == null ) {
+          if ( meta.getCreateTable() ) {
+            System.out.println( "Creating table" );
+            List<Field> fieldList = new ArrayList<Field>();
           /*
           fieldList.add(Field.of("product_id", LegacySQLTypeName.STRING));
           fieldList.add(Field.of("facility_id", LegacySQLTypeName.STRING));
@@ -170,56 +195,49 @@ public class BigQueryStream extends BaseStep implements StepInterface {
 
           // TODO copy fields and types from input stream
 
-          fieldList.add(Field.of("Name", LegacySQLTypeName.STRING));
-          fieldList.add(Field.of("Age", LegacySQLTypeName.INTEGER));
+            fieldList.add( Field.of( "Name", LegacySQLTypeName.STRING ) );
+            fieldList.add( Field.of( "Age", LegacySQLTypeName.INTEGER ) );
 
 
-          Schema schema = Schema.of(fieldList);
+            Schema schema = Schema.of( fieldList );
 
-          table = data.bigquery.create(TableInfo.of(data.tableId, StandardTableDefinition.of(schema)));
-      } else {
-          System.out.println("Please create the table: " + meta.getTableName());
-          System.exit(1);
+            table = data.bigquery.create( TableInfo.of( data.tableId, StandardTableDefinition.of( schema ) ) );
+          } else {
+            System.out.println( "Please create the table: " + meta.getTableName() );
+            System.exit( 1 );
+          }
+        } // end table null if
+
+
+      } catch ( IOException ioe ) {
+        logError( "Error loading Google Credentials File", ioe );
       }
-  } // end table null if
-
-
-} catch (IOException ioe) {
-    //ioe.printStackTrace(System.out);
-    logError("Error loading Google Credentials File",ioe);
-}
       // initialise new builder
-          data.batchCounter = 0;
-          data.insertBuilder = InsertAllRequest.newBuilder(data.tableId);
-      
-      
+      data.batchCounter = 0;
+      data.insertBuilder = InsertAllRequest.newBuilder( data.tableId );
+
     } // end if for first row (initialisation based on row data)
 
     // Do something to this row's data (create row for BigQuery, and append to current stream)
-    RowMetaInterface inputRowMeta = getInputRowMeta();
+    data.inputRowMeta = getInputRowMeta();
     int numFields = data.inputRowMeta.getFieldNames().length;
-    
-    Map<String, Object> rowContent = new HashMap<String,Object>();
-    for ( int i = 0; i < numFields; i++ ) {
-        ValueMetaInterface valueMeta = inputRowMeta.getValueMeta( i );
-        Object valueData = r[i];
 
-        // Copy field name and value to BigQuery field
-        // add field to row
-        // TODO check for null values, and ignore (not supported by BigQuery)
-        rowContent.put(valueMeta.getName(), valueData);
-        
+    Map<String, Object> rowContent = new HashMap<String, Object>();
+    for ( int i = 0; i < numFields; i++ ) {
+      ValueMetaInterface valueMeta = data.inputRowMeta.getValueMeta( i );
+      Object valueData = r[i];
+
+      // Copy field name and value to BigQuery field
+      // add field to row
+      // TODO check for null values, and ignore (not supported by BigQuery)
+      rowContent.put( valueMeta.getName(), valueData );
+
     }
     // send row to BigQuery via checkBatch
-    checkBatch(rowContent);
+    checkBatch( rowContent );
 
     // Also copy rows to output
-
-    //Object extraValue = new ValueMetaAndData();
-    
-    Object[] outputRow = RowDataUtil.addValueData( r, data.outputRowMeta.size() - 1, null );
-    
-    putRow( data.outputRowMeta, outputRow );   
+    putRow( data.outputRowMeta, r );
 
     if ( checkFeedback( getLinesRead() ) ) {
       if ( log.isBasic() ) {
@@ -230,45 +248,48 @@ public class BigQueryStream extends BaseStep implements StepInterface {
     return true;
   }
 
-  private void checkBatch(Map<String, Object> rowContent) {
-      // maintain incrementor (if datavar not null)
-      if (null != rowContent) {
-          // if not null, add to batch
-          data.insertBuilder.addRow(null,rowContent); // valid - checked source
-      }
-      // if over X rows in stream, end this batch and create another
-      // if rowContent null, we're forcing the batch on final row in PDI
-      if (null == rowContent || 500 == data.batchCounter) {
-          if (data.batchCounter != 0) {
-              // sanity check for non empty batch. E.g. if we have exactly 500 rows, the second batch is empty
-              InsertAllRequest request = data.insertBuilder.build();
-          
-              InsertAllResponse response = data.bigquery.insertAll(request);
-              if (response.hasErrors()) {
-                // If any of the insertions failed, this lets you inspect the errors
-                for (Entry<Long, List<BigQueryError>> entry : response.getInsertErrors().entrySet()) {
-                  // inspect row error
-                  //System.out.println(entry.toString());
-                  logError("Error writing rows to BigQuery: " + entry.toString());
-                }
-                stopAll();
-              }
-          }
+  private void checkBatch( Map<String, Object> rowContent ) {
+    // maintain incrementor (if datavar not null)
+    if ( null != rowContent ) {
+      // if not null, add to batch
+      data.insertBuilder.addRow( null, rowContent ); // valid - checked source
+    }
+    // if over X rows in stream, end this batch and create another
+    // if rowContent null, we're forcing the batch on final row in PDI
+    if ( null == rowContent || 500 == data.batchCounter ) {
+      if ( data.batchCounter != 0 ) {
+        // sanity check for non empty batch. E.g. if we have exactly 500 rows, the second batch is empty
+        InsertAllRequest request = data.insertBuilder.build();
 
-          // initialise new batch
-          data.batchCounter = 0;
-          data.insertBuilder = InsertAllRequest.newBuilder(data.tableId);
-      } else {
-          data.batchCounter++; // increment counter if row not null or we're not on a new stream batch
+        InsertAllResponse response = data.bigquery.insertAll( request );
+        if ( response.hasErrors() ) {
+          // If any of the insertions failed, this lets you inspect the errors
+          for ( Entry<Long, List<BigQueryError>> entry : response.getInsertErrors().entrySet() ) {
+            // inspect row error
+            //System.out.println(entry.toString());
+            logError( "Error writing rows to BigQuery: " + entry.toString() );
+          }
+          stopAll();
+        }
       }
+
+      // initialise new batch
+      data.batchCounter = 0;
+      data.insertBuilder = InsertAllRequest.newBuilder( data.tableId );
+    } else {
+      data.batchCounter++; // increment counter if row not null or we're not on a new stream batch
+    }
   }
 
+  /**
+   * Initialises the data for the step (meta data and runtime data)
+   */
   public boolean init( StepMetaInterface smi, StepDataInterface sdi ) {
     meta = (BigQueryStreamMeta) smi;
     data = (BigQueryStreamData) sdi;
 
     if ( super.init( smi, sdi ) ) {
-    	
+
 //      int nrfields = meta.getFieldName().length;
 //      data.fieldnrs = new int[nrfields];
 //      data.values = new Object[nrfields];
@@ -294,6 +315,5 @@ public class BigQueryStream extends BaseStep implements StepInterface {
       return true;
     }
     return false;
-
   }
 }

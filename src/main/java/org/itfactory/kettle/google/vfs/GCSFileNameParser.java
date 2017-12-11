@@ -20,35 +20,25 @@
  *
  ******************************************************************************/
 
-package org.itfactory.kettle.google.bigquery;
+package org.itfactory.kettle.google.vfs;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.vfs2.provider.URLFileNameParser;
 
 /**
- * File output type enum
+ * GCSFileNameParser
+ *
+ * @author asimoes
+ * @since 15-11-2017
  */
-public enum SupportedLoadFormat {
-    CSV("Csv"),
-    JSON("Json"),
-    AVRO("Avro");
+public class GCSFileNameParser extends URLFileNameParser {
 
-    private final String name;
+  private static final GCSFileNameParser INSTANCE = new GCSFileNameParser();
 
-    SupportedLoadFormat(String name) {
-        this.name = name;
-    }
+  public GCSFileNameParser() {
+    super( 843 );
+  }
 
-    String formatName() {
-        return name;
-    }
-
-    public static String[] getFormats() {
-        List<String> formats = new ArrayList<String>();
-        for(SupportedLoadFormat slf: SupportedLoadFormat.values()) {
-            formats.add(slf.formatName());
-        }
-
-        return formats.toArray(new String[formats.size()]);
-    }
+  public static GCSFileNameParser getInstance() {
+    return INSTANCE;
+  }
 }
