@@ -1,0 +1,76 @@
+{
+  {
+    "identifier": "pdi-google-cloud",
+    "title": "PDI Google Cloud extensions",
+    "description": "PDI job Entry and Steps for Google Cloud, including Cloud Storage and BigQuery",
+    "version": "1.0.0",
+    "type": "pdi",
+    "elements": [
+      "pdi-transformation",
+      "pdi-sample-data",
+      "other"
+    ],
+    "other-elements": "PDI Custom Step",
+    "pentaho-minimum-version": "7.1",
+    "pentaho-maximum-version": "none",
+    "data-sources": [
+      "flatfile-csv",
+      "flatfile-other",
+      "rest-other"
+    ],
+    "other-data-sources": "Google Cloud Storage, Google BigQuery, CSV, Avro, Json",
+    "deployment-environments": [
+      "local"
+    ],
+    "in-pentaho-demo-vm-version": "none",
+    "date-created": "2017-11-02",
+    "date-updated": "2017-11-06",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Pentaho-SE-EMEA-APAC/pdi-bigquery.git",
+      "public": "false"
+    },
+    "tags": [
+      "google",
+      "pentaho",
+      "pdi",
+      "data-integration",
+      "spoon",
+      "cloud storage",
+      "bigquery",
+      "csv",
+      "avro",
+      "json",
+      "rest",
+      "cloud",
+      "google cloud"
+    ],
+    "license": "Apache-2.0",
+    "primary-owner": {
+      "name": "Adam Fowler",
+      "email": "adam.fowler@hitachivantara.com",
+      "twitter": "@adamfowleruk",
+      "homepage": "http://adamfowler.org/",
+      "github": "adamfowleruk"
+    },
+    "backup-owners": [],
+    "antiquated": "false",
+    "needs-new-owner": "false",
+    "new-owner-information": "",
+    "documentation": {
+      "homepage": "README.md",
+      "install": "README.md",
+      "errata": "https://github.com/Pentaho-SE-EMEA-APAC/pdi-bigquery/issues",
+      "readme": "README.md",
+      "script": "",
+      "video": ""
+    },
+    "dependencies": {
+      "part": "^1.0.0"
+    },
+    "layout": "local",
+    "languages": [
+      "en"
+    ]
+  }
+}
