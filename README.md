@@ -54,6 +54,10 @@ A sample Job for the BigQuery bulk load from Google Cloud Storage, an a sample T
 
 Please submit new Issues on this GitHub repository to log any problems or feature suggestions you may have
 
-## License and Copyright statement
+## License and Copyright
 
-Unless otherwise stated, all material in this repository are Copyright Pentaho 2002-2017, and licensed under the Apache-2.0 license.
+All material in this repository are Copyright 2002-2018 Hitachi Vantara. All code is licensed as Apache 2.0 unless explicitly stated. See the LICENSE file for more details.
+
+## Support Statement
+
+This work is at Stage 1 : Development Phase: Start-up phase of an internal project. Usually a Labs experiment. (Unsupported)
