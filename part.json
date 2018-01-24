@@ -1,5 +1,4 @@
 {
-  {
     "identifier": "pdi-google-cloud",
     "title": "PDI Google Cloud extensions",
     "description": "PDI job Entry and Steps for Google Cloud, including Cloud Storage and BigQuery",
@@ -72,5 +71,4 @@
     "languages": [
       "en"
     ]
-  }
 }
